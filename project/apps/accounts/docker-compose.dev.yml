@@ -1,0 +1,29 @@
+version: '3.7'
+services:
+
+  readme.accounts.mongo:
+    image: mongo
+    restart: always
+    container_name: readme.accounts.mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: secret
+      MONGO_INITDB_DATABASE: readme-accounts
+    ports:
+      - 27017:27017
+    volumes:
+      - readme.mongo.accounts:/data/db
+
+  readme.accounts.mongo.ui:
+    image: mongo-express
+    restart: always
+    container_name: readme.accounts.mongo.ui
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: secret
+      ME_CONFIG_MONGODB_URL: mongodb://admin:secret@readme.accounts.mongo:27017/
+
+volumes:
+  readme.mongo.accounts:

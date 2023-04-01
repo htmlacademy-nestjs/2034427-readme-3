@@ -5,7 +5,10 @@ export interface IUser {
   lastname: string;
   passwordHash: string;
   avatar: string;
-  postCount: number;
-  subscribersCount: number;
-  createdAt: string;
+  postCount?: number;
+  followersCount?: number;
+  followingCount?: number;
+  followers?: string[];
+  following?: string[];
+  createdAt?: string;
 }

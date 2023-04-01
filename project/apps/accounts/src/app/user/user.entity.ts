@@ -10,7 +10,10 @@ export class UserEntity implements IUser {
   public passwordHash: string;
   public avatar: string;
   public postCount: number;
-  public subscribersCount: number;
+  public followersCount: number;
+  public followingCount: number;
+  public followers: string[];
+  public following: string[];
   public createdAt: string;
 
   constructor(user: IUser) {
@@ -29,7 +32,10 @@ export class UserEntity implements IUser {
     this.passwordHash = user.passwordHash;
     this.avatar = user.avatar;
     this.postCount = user.postCount;
-    this.subscribersCount = user.subscribersCount;
+    this.followersCount = user.followersCount;
+    this.followingCount = user.followingCount;
+    this.followers = user.followers ?? [];
+    this.following = user.following ?? [];
     this.createdAt = user.createdAt;
   }
 
@@ -41,5 +47,21 @@ export class UserEntity implements IUser {
 
   public async comparePassword(password: string): Promise<boolean> {
     return compare(password, this.passwordHash);
+  }
+
+  public followersIncrement() {
+    this.followersCount ++;
+  }
+
+  public followersDecrement() {
+    this.followersCount --;
+  }
+
+  public followingIncrement() {
+    this.followingCount ++;
+  }
+
+  public followingDecrement() {
+    this.followingCount --;
   }
 }

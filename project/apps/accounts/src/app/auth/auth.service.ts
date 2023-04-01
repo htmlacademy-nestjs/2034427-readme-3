@@ -1,15 +1,20 @@
-import {ConflictException, Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
-import {UserMemoryRepository} from "../user/user-memory.repository";
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import {CreateUserDto} from "./dto/create-user.dto";
-import {AUTH_USER_EXISTS, AUTH_USER_NOT_FOUND, AUTH_USER_PASSWORD_WRONG} from './auth.constant';
+import {AUTH_USER_EXISTS, INVALID_CREDENTIALS} from './auth.constant';
 import {UserEntity} from '../user/user.entity';
 import {LoginUserDto} from './dto/login-user.dto';
+import {UserRepository} from "../user/user.repository";
+import {IUser} from "@project/shared/app-types";
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userRepository: UserMemoryRepository) {}
+  constructor(private readonly userRepository: UserRepository) {}
 
-  public async register({email, firstname, lastname, password}: CreateUserDto) {
+  public async register({email, firstname, lastname, password}: CreateUserDto): Promise<IUser> {
     const user = {
       email, firstname, lastname, avatar: '', passwordHash: '',
       postCount: 0, subscribersCount: 0, createdAt: new Date().toISOString(),
@@ -27,24 +32,20 @@ export class AuthService {
     return this.userRepository.create(userEntity);
   }
 
-  public async verifyUser({email, password}: LoginUserDto) {
+  public async verifyUser({email, password}: LoginUserDto): Promise<IUser> {
     const existUser = await this.userRepository.findByEmail(email);
 
     if (!existUser) {
-      throw new NotFoundException(AUTH_USER_NOT_FOUND);
+      throw new UnauthorizedException(INVALID_CREDENTIALS);
     }
 
     const userEntity = new UserEntity(existUser);
     const isValidPassword = await userEntity.comparePassword(password);
 
     if (!isValidPassword) {
-      throw new UnauthorizedException(AUTH_USER_PASSWORD_WRONG);
+      throw new UnauthorizedException(INVALID_CREDENTIALS);
     }
 
     return userEntity.toObject();
-  }
-
-  public async getUser(id: string) {
-    return this.userRepository.findById(id);
   }
 }

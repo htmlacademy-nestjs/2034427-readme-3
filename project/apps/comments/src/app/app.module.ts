@@ -1,8 +1,12 @@
 import { Module } from '@nestjs/common';
 import { CommentModule } from './comment/comment.module';
+import {ConfigCommentsModule} from "@project/config/config-comments";
 
 @Module({
-  imports: [CommentModule],
+  imports: [
+    CommentModule,
+    ConfigCommentsModule,
+  ],
   controllers: [],
   providers: [],
 })
