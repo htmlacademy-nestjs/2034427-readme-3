@@ -1,0 +1,41 @@
+version: '3.7'
+services:
+
+  readme.blog.postgres:
+    image: postgres:14-alpine
+    container_name: readme.blog.postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: readme-blog
+    ports:
+      - 5432:5432
+    volumes:
+      - readme.postgres.blog:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U admin -d admin" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - readme.blog
+
+  readme.blog.pgadmin:
+    image: dpage/pgadmin4
+    container_name: readme.blog.pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "admin@app.local"
+      PGADMIN_DEFAULT_PASSWORD: "admin"
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - 8082:80
+    networks:
+      - readme.blog
+
+volumes:
+  readme.postgres.blog:
+
+networks:
+  readme.blog:
+    driver: bridge

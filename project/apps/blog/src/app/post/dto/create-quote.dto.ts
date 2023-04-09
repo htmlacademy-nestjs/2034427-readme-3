@@ -1,4 +1,4 @@
-import {ApiProperty} from "@nestjs/swagger";
+import {ApiProperty} from '@nestjs/swagger';
 
 export class CreateQuoteDto {
   @ApiProperty({
@@ -17,5 +17,7 @@ export class CreateQuoteDto {
     example: 'javascript nest',
     required: false,
   })
-  public tags: string[];
+  public tags: number[];
+
+  public userId: string;
 }

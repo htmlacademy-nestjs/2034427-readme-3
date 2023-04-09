@@ -9,7 +9,8 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "es2015",
-    "module": "esnext",
+    "module": "commonjs",
+    "esModuleInterop": true,
     "lib": ["es2017", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
@@ -22,6 +23,7 @@
       "@project/config/config-comments": [
         "libs/config/config-comments/src/index.ts"
       ],
+      "@project/models/blog-models": ["libs/models/blog-models/src/index.ts"],
       "@project/shared/app-types": ["libs/shared/app-types/src/index.ts"],
       "@project/util/util-core": ["libs/util/util-core/src/index.ts"],
       "@project/util/util-types": ["libs/util/util-types/src/index.ts"]

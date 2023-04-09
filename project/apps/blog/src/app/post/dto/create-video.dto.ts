@@ -1,4 +1,4 @@
-import {ApiProperty} from "@nestjs/swagger";
+import {ApiProperty} from '@nestjs/swagger';
 
 export class CreateVideoDto {
 
@@ -19,5 +19,7 @@ export class CreateVideoDto {
     example: 'javascript nest',
     required: false,
   })
-  public tags: string[];
+  public tags: number[];
+
+  public userId: string;
 }

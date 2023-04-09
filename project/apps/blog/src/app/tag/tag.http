@@ -1,0 +1,29 @@
+# Create new tag
+POST http://localhost:3001/api/tags HTTP/1.1
+Content-Type: application/json
+
+{
+  "title": "test"
+}
+###
+
+# Get all tags
+GET http://localhost:3001/api/tags HTTP/1.1
+###
+
+# Get tag by ID
+GET http://localhost:3001/api/tags/1 HTTP/1.1
+###
+
+# Delete tag
+DELETE http://localhost:3001/api/tags/4 HTTP/1.1
+###
+
+# Create new tag
+PATCH http://localhost:3001/api/tags/1 HTTP/1.1
+Content-Type: application/json
+
+{
+  "title": "foo"
+}
+###

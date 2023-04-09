@@ -1,4 +1,4 @@
-import {ApiProperty} from "@nestjs/swagger";
+import {ApiProperty} from '@nestjs/swagger';
 
 export class CreateTextDto {
   @ApiProperty({
@@ -24,5 +24,7 @@ export class CreateTextDto {
     example: 'javascript nest',
     required: false,
   })
-  public tags: string[];
+  public tags: number[];
+
+  public userId: string;
 }

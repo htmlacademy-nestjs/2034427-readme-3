@@ -1,15 +1,13 @@
-import {Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put} from '@nestjs/common';
+import {Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post} from '@nestjs/common';
+import {ApiResponse, ApiTags} from '@nestjs/swagger';
+import {fillObject} from '@project/util/util-core';
 import {PostService} from './post.service';
 import {CreateVideoDto} from './dto/create-video.dto';
 import {CreateTextDto} from './dto/create-text.dto';
 import {CreateQuoteDto} from './dto/create-quote.dto';
 import {CreatePhotoDto} from './dto/create-photo.dto';
 import {CreateLinkDto} from './dto/create-link.dto';
-import {ApiResponse, ApiTags} from '@nestjs/swagger';
-import {count} from "rxjs";
-import {fillObject} from "@project/util/util-core";
-import {PostRdo} from "./rdo/post.rdo";
-import {PostManyRdo} from "./rdo/post-many.rdo";
+import {PostRdo} from './rdo/post.rdo'
 
 @ApiTags('post')
 @Controller('posts')
@@ -76,9 +74,10 @@ export class PostController {
     status: HttpStatus.OK,
     description: 'Post has been successfully updated'
   })
-  @Put(':id/video')
+  @Patch(':id/video')
   public async updateVideo(@Param('id') id: string, @Body() dto: CreateVideoDto) {
-    const post = await this.postService.updateVideoPost(id, dto);
+    const postId = parseInt(id, 10);
+    const post = await this.postService.updateVideoPost(postId, dto);
     return fillObject(PostRdo, post);
   }
 
@@ -87,9 +86,10 @@ export class PostController {
     status: HttpStatus.OK,
     description: 'Post has been successfully updated'
   })
-  @Put(':id/text')
+  @Patch(':id/text')
   public async updateText(@Param('id') id: string, @Body() dto: CreateTextDto) {
-    const post = await this.postService.updateTextPost(id, dto);
+    const postId = parseInt(id, 10);
+    const post = await this.postService.updateTextPost(postId, dto);
     return fillObject(PostRdo, post);
   }
 
@@ -98,9 +98,10 @@ export class PostController {
     status: HttpStatus.OK,
     description: 'Post has been successfully updated'
   })
-  @Put(':id/quote')
+  @Patch(':id/quote')
   public async updateQuote(@Param('id') id: string, @Body() dto: CreateQuoteDto) {
-    const post = await this.postService.updateQuotePost(id, dto);
+    const postId = parseInt(id, 10);
+    const post = await this.postService.updateQuotePost(postId, dto);
     return fillObject(PostRdo, post);
   }
 
@@ -109,9 +110,10 @@ export class PostController {
     status: HttpStatus.OK,
     description: 'Post has been successfully updated'
   })
-  @Put(':id/photo')
+  @Patch(':id/photo')
   public async updatePhoto(@Param('id') id: string, @Body() dto: CreatePhotoDto) {
-    const post = await this.postService.updatePhotoPost(id, dto);
+    const postId = parseInt(id, 10);
+    const post = await this.postService.updatePhotoPost(postId, dto);
     return fillObject(PostRdo, post);
   }
 
@@ -120,9 +122,10 @@ export class PostController {
     status: HttpStatus.OK,
     description: 'Post has been successfully updated'
   })
-  @Put(':id/link')
+  @Patch(':id/link')
   public async updateLink(@Param('id') id: string, @Body() dto: CreateLinkDto) {
-    const post = await this.postService.updateLinkPost(id, dto);
+    const postId = parseInt(id, 10);
+    const post = await this.postService.updateLinkPost(postId, dto);
     return fillObject(PostRdo, post);
   }
 
@@ -133,33 +136,19 @@ export class PostController {
   @HttpCode(204)
   @Delete(':id')
   public async delete(@Param('id') id: string) {
-    return this.postService.deletePost(id);
+    const postId = parseInt(id, 10);
+    await this.postService.deletePost(postId);
   }
 
   @ApiResponse({
-    type: PostManyRdo,
+    type: [PostRdo],
     status: HttpStatus.OK,
     description: 'Get all posts list'
   })
   @Get()
   public async getAll() {
     const posts = await this.postService.getAll();
-    return this.postService.postsResponse(
-      posts.map((post) => fillObject(PostRdo, post))
-    );
-  }
-
-  @ApiResponse({
-    type: PostManyRdo,
-    status: HttpStatus.OK,
-    description: 'Get user posts list'
-  })
-  @Get(':userId/user')
-  public async getByUser(@Param('userId') userId: string) {
-    const posts = await this.postService.getByAuthor(userId);
-    return this.postService.postsResponse(
-      posts.map((post) => fillObject(PostRdo, post))
-    );
+    return  fillObject(PostRdo, posts);
   }
 
   @ApiResponse({
@@ -169,7 +158,19 @@ export class PostController {
   })
   @Get(':id')
   public async show(@Param('id') id: string) {
-    const post = await this.postService.getPost(id);
+    const postId = parseInt(id, 10);
+    const post = await this.postService.getPost(postId);
     return fillObject(PostRdo, post);
+  }
+
+  @ApiResponse({
+    type: [PostRdo],
+    status: HttpStatus.OK,
+    description: 'Get user posts list'
+  })
+  @Get(':id/user')
+  public async getByUserId(@Param('id') userId: string) {
+    const posts = await this.postService.getByAuthor(userId);
+    return fillObject(PostRdo, posts);
   }
 }

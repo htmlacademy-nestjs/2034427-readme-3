@@ -1,15 +1,16 @@
-import {PostStatus, PostType} from "@project/shared/app-types";
-import {Expose} from "class-transformer";
-import {ApiProperty} from "@nestjs/swagger";
+import {IComment, ITag} from '@project/shared/app-types';
+import {PostType, PostStatus} from '@prisma/client';
+import {Expose} from 'class-transformer';
+import {ApiProperty} from '@nestjs/swagger';
 
 export class PostRdo {
   @ApiProperty({description: 'Unique post ID', example: '23'})
-  @Expose({ name: '_id'})
-  public id: string;
+  @Expose()
+  public postId: number;
 
   @ApiProperty({description: 'Post type', example: 'video'})
   @Expose()
-  public type: PostType;
+  public postType: PostType;
 
   @ApiProperty({description: 'Post title', example: 'my post'})
   @Expose()
@@ -43,13 +44,9 @@ export class PostRdo {
   @Expose()
   public quoteAuthor: string;
 
-  @ApiProperty({description: 'Tag list', example: 'tag-1, tag-2'})
-  @Expose()
-  public tags: string[];
-
   @ApiProperty({description: 'Post author ID', example: '5'})
   @Expose()
-  public author: string;
+  public userId: string;
 
   @ApiProperty({description: 'Is repost', example: false})
   @Expose()
@@ -75,9 +72,13 @@ export class PostRdo {
   @Expose()
   public commentsCount: number;
 
-  @ApiProperty({description: 'Date post created', example: '2023-03-25T11:09:47.011Z'})
+  @ApiProperty({description: 'Tag list', example: [{id: 1, title: 'foo'}]})
   @Expose()
-  public createdAt: string;
+  public tags: ITag[];
+
+  @ApiProperty({description: 'Comment list', example: []})
+  @Expose()
+  comments: IComment[];
 
   @ApiProperty({description: 'Date post published', example: '2023-03-25T11:09:47.011Z'})
   @Expose()
