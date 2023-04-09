@@ -1,27 +1,27 @@
-up: docker-up
-down: docker-down
-clear: docker-clear
-reset: down up
-
-nx-all: all-accounts-run
+nx-all: all-run
 nx-account: account-run
 nx-blog: blog-run
 nx-comments: comments-run
 
 ### Docker
 
-docker-up:
+account-up:
 	docker-compose --file ./apps/accounts/docker-compose.dev.yml up -d
-
-docker-down:
+account-down:
 	docker-compose --file ./apps/accounts/docker-compose.dev.yml down --remove-orphans
-
-docker-clear:
+account-clear:
 	docker-compose --file ./apps/accounts/docker-compose.dev.yml down --remove-orphans -v
+
+blog-up:
+	docker-compose --file ./apps/blog/docker-compose.dev.yml up -d
+blog-down:
+	docker-compose --file ./apps/blog/docker-compose.dev.yml down --remove-orphans
+blog-clear:
+	docker-compose --file ./apps/blog/docker-compose.dev.yml down --remove-orphans -v
 
 ### NX
 
-all-accounts-run:
+all-run:
 	nx run-many --target=serve --all --parallel=10
 
 account-run:
@@ -29,9 +29,6 @@ account-run:
 
 blog-run:
 	nx run blog:serve
-
-comments-run:
-	nx run comments:serve
 
 nx-lint:
 	nx run-many --target=lint

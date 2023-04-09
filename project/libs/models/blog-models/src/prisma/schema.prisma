@@ -1,0 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../../../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Post {
+  postId          Int        @id @default(autoincrement()) @map("post_id")
+  postType        PostType   @map("post_type")
+  title           String?
+  anons           String?
+  text            String?
+  photo           String?
+  video           String?
+  linkUrl         String?    @map("link_url")
+  descriptionLink String?    @map("description_link")
+  quoteAuthor     String?    @map("quote_author")
+  tags            Tag[]
+  isRepost        Boolean    @default(false) @map("is_repost")
+  originalId      String?    @map("original_id")
+  originalAuthor  String?    @map("original_author")
+  status          PostStatus @default(publish)
+  likeCount       Int        @default(0) @map("like_count")
+  commentCount    Int        @default(0) @map("comment_count")
+  createdAt       DateTime   @default(now()) @map("created_at")
+  publishedAt     DateTime   @updatedAt @map("published_at")
+  userId          String?    @map("user_id")
+  comments        Comment[]
+  Favorite        Favorite[]
+
+  @@map("posts")
+}
+
+model Tag {
+  id     Int    @id @default(autoincrement())
+  title String
+  posts Post[]
+
+  @@map("tags")
+}
+
+model Favorite {
+  favoriteId Int      @id @default(autoincrement()) @map("favorite_id")
+  post       Post     @relation(fields: [postId], references: [postId], onDelete: Cascade)
+  postId     Int      @map("post_id")
+  userId     String   @map("user_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("favorites")
+}
+
+model Comment {
+  commentId Int      @id @default(autoincrement()) @map("comment_id")
+  message   String
+  userId    String   @map("user_id")
+  post      Post     @relation(fields: [postId], references: [postId], onDelete: Cascade, onUpdate: Cascade)
+  postId    Int      @map("post_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("comments")
+}
+
+enum PostType {
+  video
+  text
+  quote
+  photo
+  link
+}
+
+enum PostStatus {
+  publish
+  draft
+}

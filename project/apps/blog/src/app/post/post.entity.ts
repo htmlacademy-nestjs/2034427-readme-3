@@ -1,8 +1,10 @@
-import {IPost, PostStatus, PostType} from '@project/shared/app-types';
+import {IComment, IPost, ITag} from '@project/shared/app-types';
+import {IEntity} from '@project/util/util-types';
+import {PostType, PostStatus} from '@prisma/client';
 
-export class PostEntity implements IPost {
-  public _id: string;
-  public type: PostType;
+export class PostEntity implements IEntity<PostEntity>, IPost {
+  public id: number;
+  public postType: PostType;
   public title: string;
   public anons: string;
   public text: string;
@@ -11,45 +13,39 @@ export class PostEntity implements IPost {
   public linkUrl: string;
   public descriptionLink: string;
   public quoteAuthor: string;
-  public tags: string[];
-  public author: string;
-  public isRepost: boolean;
+  public tags: ITag[];
+  public userId: string;
+  public isRepost?: boolean;
   public originalId: string;
   public originalAuthor: string;
   public status: PostStatus;
   public likeCount: number;
-  public commentsCount: number;
-  public createdAt: string;
-  public publishedAt: string;
+  public commentCount: number;
+  public comments: IComment[];
+  public createdAt: Date;
+  public publishedAt: Date;
 
   constructor(post: IPost) {
     this.fillEntity(post);
   }
 
-  public toObject() {
-    return {...this};
+  public toObject(): PostEntity {
+    return {
+      ...this,
+      tags: this.tags.map(({id}) => ({id})),
+      comments: this.comments.map(({ id }) => ({ id }))
+    };
   }
 
-  public fillEntity(post: IPost) {
-    this._id = post._id;
-    this.type = post.type;
-    this.title = post.title ?? '';
-    this.anons = post.anons ?? '';
-    this.text = post.text ?? '';
-    this.photo = post.photo ?? '';
-    this.video = post.video ?? '';
-    this.linkUrl = post.linkUrl ?? '';
-    this.descriptionLink = post.descriptionLink ?? '';
-    this.quoteAuthor = post.quoteAuthor ?? '';
-    this.tags = post.tags ?? [];
-    this.author = post.author;
-    this.isRepost = post.isRepost;
-    this.originalId = post.originalId ?? '';
-    this.originalAuthor = post.originalAuthor ?? '';
-    this.status = post.status;
-    this.likeCount = post.likeCount;
-    this.commentsCount = post.commentsCount;
-    this.createdAt = post.createdAt;
-    this.publishedAt = post.publishedAt;
+  public fillEntity(entity: Partial<IPost>): void {
+    Object.assign(this, entity)
+    this.tags = [...entity.tags];
+    this.isRepost = false;
+    this.status = PostStatus.publish;
+    this.likeCount = 0;
+    this.commentCount = 0;
+    this.comments = [];
+    this.createdAt = new Date();
+    this.publishedAt = new Date();
   }
 }

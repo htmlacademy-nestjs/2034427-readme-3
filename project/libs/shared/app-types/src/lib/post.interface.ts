@@ -1,9 +1,10 @@
-import {PostStatus} from './post-status.enum';
-import {PostType} from './post-type.enum';
+import {ITag} from './tag.interface';
+import {IComment} from './comment.interface';
+import {PostType, PostStatus} from '@prisma/client';
 
 export interface IPost {
-  _id?: string;
-  type: PostType;
+  id?: number;
+  postType: PostType;
   title?: string;
   anons?: string;
   text?: string;
@@ -12,14 +13,15 @@ export interface IPost {
   linkUrl?: string;
   descriptionLink?: string;
   quoteAuthor?: string;
-  tags: string[];
-  author: string;
-  isRepost: boolean;
+  tags: ITag[];
+  userId: string;
+  isRepost?: boolean;
   originalId?: string;
   originalAuthor?: string;
-  status: PostStatus;
-  likeCount: number;
-  commentsCount: number;
-  createdAt: string;
-  publishedAt: string;
+  status?: PostStatus;
+  likeCount?: number;
+  commentCount?: number;
+  createdAt?: Date;
+  publishedAt?: Date;
+  comments?: IComment[];
 }
