@@ -24,7 +24,7 @@ export class PostController {
   })
   @Post('video')
   public async createVideo(@Body() dto: CreateVideoDto) {
-    const post = await this.postService.createVideoPost(dto);
+    const post = await this.postService.createPost(dto, PostType.video);
     return fillObject(PostRdo, post);
   }
 
@@ -35,7 +35,7 @@ export class PostController {
   })
   @Post('text')
   public async createText(@Body() dto: CreateTextDto) {
-    const post = await this.postService.createTextPost(dto);
+    const post = await this.postService.createPost(dto, PostType.text);
     return fillObject(PostRdo, post);
   }
 
@@ -46,7 +46,7 @@ export class PostController {
   })
   @Post('quote')
   public async createQuote(@Body() dto: CreateQuoteDto) {
-    const post = await this.postService.createQuotePost(dto);
+    const post = await this.postService.createPost(dto, PostType.quote);
     return fillObject(PostRdo, post);
   }
 
@@ -57,7 +57,7 @@ export class PostController {
   })
   @Post('photo')
   public async createPhoto(@Body() dto: CreatePhotoDto) {
-    const post = await this.postService.createPhotoPost(dto);
+    const post = await this.postService.createPost(dto, PostType.photo);
     return fillObject(PostRdo, post);
   }
 
@@ -68,7 +68,7 @@ export class PostController {
   })
   @Post('link')
   public async createLink(@Body() dto: CreateLinkDto) {
-    const post = await this.postService.createLinkPost(dto);
+    const post = await this.postService.createPost(dto, PostType.link);
     return fillObject(PostRdo, post);
   }
 
@@ -79,7 +79,7 @@ export class PostController {
   })
   @Patch(':id/video')
   public async updateVideo(@Param('id') postId: number, @Body() dto: CreateVideoDto) {
-    const post = await this.postService.updateVideoPost(postId, dto);
+    const post = await this.postService.updatePost(postId, dto, PostType.video);
     return fillObject(PostRdo, post);
   }
 
@@ -90,7 +90,7 @@ export class PostController {
   })
   @Patch(':id/text')
   public async updateText(@Param('id') postId: number, @Body() dto: CreateTextDto) {
-    const post = await this.postService.updateTextPost(postId, dto);
+    const post = await this.postService.updatePost(postId, dto, PostType.text);
     return fillObject(PostRdo, post);
   }
 
@@ -101,7 +101,7 @@ export class PostController {
   })
   @Patch(':id/quote')
   public async updateQuote(@Param('id') postId: number, @Body() dto: CreateQuoteDto) {
-    const post = await this.postService.updateQuotePost(postId, dto);
+    const post = await this.postService.updatePost(postId, dto, PostType.quote);
     return fillObject(PostRdo, post);
   }
 
@@ -112,7 +112,7 @@ export class PostController {
   })
   @Patch(':id/photo')
   public async updatePhoto(@Param('id') postId: number, @Body() dto: CreatePhotoDto) {
-    const post = await this.postService.updatePhotoPost(postId, dto);
+    const post = await this.postService.updatePost(postId, dto, PostType.photo);
     return fillObject(PostRdo, post);
   }
 
@@ -123,7 +123,7 @@ export class PostController {
   })
   @Patch(':id/link')
   public async updateLink(@Param('id') postId: number, @Body() dto: CreateLinkDto) {
-    const post = await this.postService.updateLinkPost(postId, dto);
+    const post = await this.postService.updatePost(postId, dto, PostType.link);
     return fillObject(PostRdo, post);
   }
 
@@ -136,7 +136,6 @@ export class PostController {
   public async delete(@Param('id') postId: number) {
     await this.postService.deletePost(postId);
   }
-
 
   @ApiResponse({
     type: [PostRdo],

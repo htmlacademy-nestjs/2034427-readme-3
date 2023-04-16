@@ -3,7 +3,7 @@ import {IComment} from './comment.interface';
 import {PostType, PostStatus} from '@prisma/client';
 
 export interface IPost {
-  id?: number;
+  postId?: number;
   postType: PostType;
   title?: string;
   anons?: string;

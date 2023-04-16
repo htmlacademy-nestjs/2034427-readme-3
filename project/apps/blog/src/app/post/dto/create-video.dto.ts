@@ -23,12 +23,12 @@ export class CreateVideoDto {
 
   @ApiProperty({
     description: 'Post tags list',
-    example: [1,2],
+    example: ["foo","bar"],
     required: false,
   })
   @IsArray()
   @IsOptional()
-  public tags: number[];
+  public tags: string[];
 
   @ApiProperty({
     description: 'User unique identifier',

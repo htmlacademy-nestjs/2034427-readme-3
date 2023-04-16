@@ -13,12 +13,12 @@ export class CreatePhotoDto {
 
   @ApiProperty({
     description: 'Post tags list',
-    example: 'javascript nest',
+    example: ["foo","bar"],
     required: false,
   })
   @IsArray()
   @IsOptional()
-  public tags: number[];
+  public tags: string[];
 
   @ApiProperty({
     description: 'User unique identifier',
