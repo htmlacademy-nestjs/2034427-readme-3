@@ -1,6 +1,7 @@
 import {Injectable} from '@nestjs/common';
 import {ICRUDRepository} from '@project/util/util-types';
 import {IPost} from '@project/shared/app-types';
+import {PostQuery, SortingType} from './query/post.query';
 import {PostEntity} from './post.entity';
 import {PrismaService} from '../prisma/prisma.service';
 
@@ -50,12 +51,36 @@ export class PostRepository implements ICRUDRepository<PostEntity, number, IPost
     });
   }
 
-  public find(): Promise<IPost[]> {
+  public find(query: PostQuery): Promise<IPost[]> {
+    const {userId, tag, postType, limit, page, sort, direction, status} = query;
     return this.prisma.post.findMany({
+      where: {
+        AND: [
+          {
+            status: status,
+          },
+          {
+            userId: userId ?? undefined,
+          },
+          {
+            postType: postType ?? undefined,
+          },
+          {
+            tags: {
+              some: {
+                title: tag ?? undefined
+              }
+            }
+          }
+        ]
+      },
       include: {
         tags: true,
         comments: true,
-      }
+      },
+      orderBy: this.getSorting(sort, direction),
+      take: limit,
+      skip: page > 0 ? limit * (page - 1) : undefined,
     });
   }
 
@@ -91,5 +116,16 @@ export class PostRepository implements ICRUDRepository<PostEntity, number, IPost
         comments: true,
       }
     })
+  }
+
+  private getSorting(sort: SortingType, direction: 'desc' | 'asc' = 'desc') {
+    switch (sort) {
+      case SortingType.Likes:
+        return {likeCount: direction};
+      case SortingType.Comments:
+        return {commentCount: direction};
+      case SortingType.PublishAt:
+        return {publishedAt: direction};
+    }
   }
 }

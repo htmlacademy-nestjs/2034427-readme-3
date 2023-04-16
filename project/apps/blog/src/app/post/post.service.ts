@@ -10,6 +10,7 @@ import {CreateQuoteDto} from './dto/create-quote.dto';
 import {CreatePhotoDto} from './dto/create-photo.dto';
 import {CreateLinkDto} from './dto/create-link.dto';
 import {POST_NOT_FOUND} from './post.constant';
+import {PostQuery} from './query/post.query';
 
 @Injectable()
 export class PostService {
@@ -78,8 +79,8 @@ export class PostService {
     return this.postRepository.update(id, postEntity);
   }
 
-  public async getAll(): Promise<IPost[]> {
-    return this.postRepository.find();
+  public async getAll(query: PostQuery): Promise<IPost[]> {
+    return this.postRepository.find(query);
   }
 
   public async getByAuthor(userId: string): Promise<IPost[]> {

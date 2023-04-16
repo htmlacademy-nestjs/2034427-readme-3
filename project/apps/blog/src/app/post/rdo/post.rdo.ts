@@ -70,7 +70,7 @@ export class PostRdo {
 
   @ApiProperty({description: 'Count comments', example: '5'})
   @Expose()
-  public commentsCount: number;
+  public commentCount: number;
 
   @ApiProperty({description: 'Tag list', example: [{id: 1, title: 'foo'}]})
   @Expose()
