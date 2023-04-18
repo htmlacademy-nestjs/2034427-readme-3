@@ -1,19 +1,30 @@
 import {ApiProperty} from '@nestjs/swagger';
+import {IsArray, IsOptional, IsString} from "class-validator";
 
 export class CreatePhotoDto {
 
   @ApiProperty({
     description: 'Post Image',
-    example: 'image.jpg'
+    example: 'image.jpg',
+    required: true
   })
+  @IsString()
   public photo: string;
 
   @ApiProperty({
     description: 'Post tags list',
-    example: 'javascript nest',
+    example: ["foo","bar"],
     required: false,
   })
-  public tags: number[];
+  @IsArray()
+  @IsOptional()
+  public tags: string[];
 
+  @ApiProperty({
+    description: 'User unique identifier',
+    example: 100,
+    required: true,
+  })
+  @IsString()
   public userId: string;
 }

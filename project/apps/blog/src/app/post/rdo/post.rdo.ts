@@ -1,5 +1,5 @@
-import {IComment, ITag} from '@project/shared/app-types';
-import {PostType, PostStatus} from '@prisma/client';
+import {ITag} from '@project/shared/app-types';
+import {PostType} from '@prisma/client';
 import {Expose} from 'class-transformer';
 import {ApiProperty} from '@nestjs/swagger';
 
@@ -60,25 +60,17 @@ export class PostRdo {
   @Expose()
   public originalAuthor: string;
 
-  @ApiProperty({description: 'Post publish/draft', example: 'publish'})
-  @Expose()
-  public status: PostStatus;
-
   @ApiProperty({description: 'Count likes', example: '25'})
   @Expose()
   public likeCount: number;
 
   @ApiProperty({description: 'Count comments', example: '5'})
   @Expose()
-  public commentsCount: number;
+  public commentCount: number;
 
   @ApiProperty({description: 'Tag list', example: [{id: 1, title: 'foo'}]})
   @Expose()
   public tags: ITag[];
-
-  @ApiProperty({description: 'Comment list', example: []})
-  @Expose()
-  comments: IComment[];
 
   @ApiProperty({description: 'Date post published', example: '2023-03-25T11:09:47.011Z'})
   @Expose()

@@ -3,16 +3,20 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import {CreateUserDto} from "./dto/create-user.dto";
-import {AUTH_USER_EXISTS, INVALID_CREDENTIALS} from './auth.constant';
-import {UserEntity} from '../user/user.entity';
-import {LoginUserDto} from './dto/login-user.dto';
-import {UserRepository} from "../user/user.repository";
-import {IUser} from "@project/shared/app-types";
+import { ITokenPayload, IUser } from "@project/shared/app-types";
+import { JwtService } from "@nestjs/jwt";
+import { CreateUserDto } from "./dto/create-user.dto";
+import { AUTH_USER_EXISTS, INVALID_CREDENTIALS } from './auth.constant';
+import { UserEntity } from '../user/user.entity';
+import { LoginUserDto } from './dto/login-user.dto';
+import { UserRepository } from "../user/user.repository";
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly jwtService: JwtService,
+  ) {}
 
   public async register({email, firstname, lastname, password}: CreateUserDto): Promise<IUser> {
     const user = {
@@ -47,5 +51,18 @@ export class AuthService {
     }
 
     return userEntity.toObject();
+  }
+
+  public async createToken(user: IUser) {
+    const payload: ITokenPayload = {
+      sub: user._id,
+      email: user.email,
+      lastname: user.lastname,
+      firstname: user.firstname,
+    };
+
+    return {
+      accessToken: await this.jwtService.signAsync(payload),
+    }
   }
 }

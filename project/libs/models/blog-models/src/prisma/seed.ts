@@ -17,6 +17,14 @@ async function fillDb() {
             userId: '15',
             likeCount: 5,
             commentCount: 0,
+            comments: {
+              create: [
+                {
+                  message: 'stupid comment',
+                  userId: '14',
+                }
+              ]
+            }
           },
         ]
       },
@@ -24,6 +32,24 @@ async function fillDb() {
   });
   await prisma.tag.upsert({
     where: {id: 2},
+    update: {},
+    create: {
+      title: 'nodejs',
+      posts: {
+        create: [
+          {
+            postType: PostType.photo,
+            photo: 'nodejs-image.png',
+            userId: '16',
+            likeCount: 12,
+            commentCount: 7,
+          },
+        ]
+      },
+    }
+  });
+  await prisma.tag.upsert({
+    where: {id: 3},
     update: {},
     create: {
       title: 'bar',
@@ -55,6 +81,25 @@ async function fillDb() {
           }
         ]
       }
+    }
+  });
+  await prisma.tag.upsert({
+    where: {id: 4},
+    update: {},
+    create: {
+      title: 'backend',
+      posts: {
+        create: [
+          {
+            postType: PostType.link,
+            linkUrl: 'https://nodejs.org',
+            descriptionLink: 'Official site nodejs',
+            userId: '14',
+            likeCount: 10,
+            commentCount: 4,
+          },
+        ]
+      },
     }
   });
   console.info('🤘️ Database was filled');

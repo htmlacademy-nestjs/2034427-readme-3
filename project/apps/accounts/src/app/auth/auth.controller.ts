@@ -1,11 +1,11 @@
-import {Body, Controller, HttpStatus, Post} from '@nestjs/common';
-import {ApiResponse, ApiTags} from '@nestjs/swagger';
-import {fillObject} from '@project/util/util-core';
-import {AuthService} from './auth.service';
-import {CreateUserDto} from './dto/create-user.dto';
-import {UserRdo} from './rdo/user.rdo';
-import {LoginUserDto} from './dto/login-user.dto';
-import {LoggedUserRdo} from './rdo/logged-user.rdo';
+import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { fillObject } from '@project/util/util-core';
+import { AuthService } from './auth.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UserRdo } from './rdo/user.rdo';
+import { LoginUserDto } from './dto/login-user.dto';
+import { LoggedUserRdo } from './rdo/logged-user.rdo';
 
 @ApiTags('authentication')
 @Controller('auth')
@@ -31,6 +31,7 @@ export class AuthController {
   @Post('login')
   public async login(@Body() dto: LoginUserDto): Promise<LoggedUserRdo> {
     const verifyUser = await this.authService.verifyUser(dto);
-    return fillObject(LoggedUserRdo, verifyUser);
+    const loggedUser = await this.authService.createToken(verifyUser);
+    return fillObject(LoggedUserRdo, Object.assign(verifyUser, loggedUser));
   }
 }

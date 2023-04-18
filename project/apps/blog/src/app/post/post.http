@@ -62,7 +62,7 @@ DELETE http://localhost:3001/api/posts/14 HTTP/1.1
 ###
 
 # Get all posts
-GET http://localhost:3001/api/posts HTTP/1.1
+GET http://localhost:3001/api/posts?limit=2&page=2&sort=likeCount HTTP/1.1
 ###
 
 # Show post by ID

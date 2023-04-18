@@ -36,6 +36,14 @@ export class TagRepository implements ICRUDRepository<TagEntity, number, ITag> {
     })
   }
 
+  public async findByTitle(title: string): Promise<ITag> {
+    return this.prisma.tag.findFirst({
+      where: {
+        title
+      }
+    })
+  }
+
   public async find(): Promise<ITag[]> {
     return this.prisma.tag.findMany();
   }

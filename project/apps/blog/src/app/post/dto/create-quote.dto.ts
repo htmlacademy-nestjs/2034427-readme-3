@@ -1,23 +1,38 @@
 import {ApiProperty} from '@nestjs/swagger';
+import {IsArray, IsNotEmpty, IsOptional, IsString} from "class-validator";
 
 export class CreateQuoteDto {
   @ApiProperty({
     description: 'Quote text',
-    example: 'Text quote'
+    example: 'Text quote',
+    required: true
   })
+  @IsString()
+  @IsNotEmpty()
   public text: string;
   @ApiProperty({
     description: 'Quote author',
-    example: 'Keks'
+    example: 'Keks',
+    required: true
   })
+  @IsString()
+  @IsNotEmpty()
   public quoteAuthor: string;
 
   @ApiProperty({
     description: 'Post tags list',
-    example: 'javascript nest',
+    example: ["foo","bar"],
     required: false,
   })
-  public tags: number[];
+  @IsArray()
+  @IsOptional()
+  public tags: string[];
 
+  @ApiProperty({
+    description: 'User unique identifier',
+    example: 100,
+    required: true,
+  })
+  @IsString()
   public userId: string;
 }
