@@ -1,5 +1,5 @@
-import {IEntity} from "@project/util/util-types";
-import {IFile} from "@project/shared/app-types";
+import {IEntity} from '@project/util/util-types';
+import {IFile} from '@project/shared/app-types';
 
 export class FileEntity implements IEntity<FileEntity>, IFile {
   public id: string;
@@ -15,12 +15,6 @@ export class FileEntity implements IEntity<FileEntity>, IFile {
 
   public fillEntity(entity): void {
     Object.assign(this, entity);
-    // this.id = entity.id;
-    // this.hashName = entity.hashName;
-    // this.mimetype = entity.mimetype;
-    // this.originalName = entity.originalName;
-    // this.path = entity.path;
-    // this.size = entity.size;
   }
 
   public toObject(): FileEntity {

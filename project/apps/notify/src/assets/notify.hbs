@@ -1,0 +1,16 @@
+<div>
+  <h4>Hello, New publish</h4>
+  <ol style="padding-left: 0">
+    {{#each publish}}
+      <li>
+        <a href="{{url}}" style="color: #304ecc">
+          {{#if title}}
+            <b>{{title}}</b>
+          {{else}}
+            <b>{{postType}} post</b>
+          {{/if}}
+        </a>
+      </li>
+    {{/each}}
+  </ol>
+</div>

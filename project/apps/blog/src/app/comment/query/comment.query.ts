@@ -1,6 +1,6 @@
-import {Transform} from "class-transformer";
-import {IsNumber, IsOptional} from "class-validator";
-import {DEFAULT_COMMENT_COUNT_LIMIT} from "../comment.constant";
+import {Transform} from 'class-transformer';
+import {IsNumber, IsOptional} from 'class-validator';
+import {DEFAULT_COMMENT_COUNT_LIMIT} from '../comment.constant';
 
 export class CommentQuery {
   @Transform(({ value } ) => +value || DEFAULT_COMMENT_COUNT_LIMIT)

@@ -11,11 +11,15 @@ import {CreatePhotoDto} from './dto/create-photo.dto';
 import {CreateLinkDto} from './dto/create-link.dto';
 import {PostRdo} from './rdo/post.rdo'
 import {PostQuery, SortingType} from './query/post.query';
+import {NotifyService} from '../notify/notify.service';
 
 @ApiTags('post')
 @Controller('posts')
 export class PostController {
-  constructor(private readonly postService: PostService) {}
+  constructor(
+    private readonly postService: PostService,
+    private readonly notifyService: NotifyService,
+  ) {}
 
   @ApiResponse({
     type: PostRdo,
@@ -25,6 +29,7 @@ export class PostController {
   @Post('video')
   public async createVideo(@Body() dto: CreateVideoDto) {
     const post = await this.postService.createPost(dto, PostType.video);
+    await this.notifyService.register(post);
     return fillObject(PostRdo, post);
   }
 
@@ -36,6 +41,7 @@ export class PostController {
   @Post('text')
   public async createText(@Body() dto: CreateTextDto) {
     const post = await this.postService.createPost(dto, PostType.text);
+    await this.notifyService.register(post);
     return fillObject(PostRdo, post);
   }
 
@@ -47,6 +53,7 @@ export class PostController {
   @Post('quote')
   public async createQuote(@Body() dto: CreateQuoteDto) {
     const post = await this.postService.createPost(dto, PostType.quote);
+    await this.notifyService.register(post);
     return fillObject(PostRdo, post);
   }
 
@@ -58,6 +65,7 @@ export class PostController {
   @Post('photo')
   public async createPhoto(@Body() dto: CreatePhotoDto) {
     const post = await this.postService.createPost(dto, PostType.photo);
+    await this.notifyService.register(post);
     return fillObject(PostRdo, post);
   }
 
@@ -69,6 +77,7 @@ export class PostController {
   @Post('link')
   public async createLink(@Body() dto: CreateLinkDto) {
     const post = await this.postService.createPost(dto, PostType.link);
+    await this.notifyService.register(post);
     return fillObject(PostRdo, post);
   }
 

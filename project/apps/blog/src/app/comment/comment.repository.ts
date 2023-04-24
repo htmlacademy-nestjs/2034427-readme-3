@@ -1,9 +1,9 @@
-import {Injectable} from "@nestjs/common";
-import {PrismaService} from "../prisma/prisma.service";
-import {CommentEntity} from "./comment.entity";
-import {IComment} from "@project/shared/app-types";
-import {ICRUDRepository} from "@project/util/util-types";
-import {CommentQuery} from "./query/comment.query";
+import {Injectable} from '@nestjs/common';
+import {PrismaService} from '../prisma/prisma.service';
+import {CommentEntity} from './comment.entity';
+import {IComment} from '@project/shared/app-types';
+import {ICRUDRepository} from '@project/util/util-types';
+import {CommentQuery} from './query/comment.query';
 
 @Injectable()
 export class CommentRepository implements ICRUDRepository<CommentEntity, number, IComment>{

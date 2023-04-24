@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import {CommentRepository} from "./comment.repository";
-import {PostService} from "../post/post.service";
-import {CommentEntity} from "./comment.entity";
-import {CreateCommentDto} from "./dto/create-comment.dto";
-import {CommentQuery} from "./query/comment.query";
+import {CommentRepository} from './comment.repository';
+import {PostService} from '../post/post.service';
+import {CommentEntity} from './comment.entity';
+import {CreateCommentDto} from './dto/create-comment.dto';
+import {CommentQuery} from './query/comment.query';
 
 @Injectable()
 export class CommentService {

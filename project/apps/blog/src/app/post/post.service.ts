@@ -5,8 +5,8 @@ import {PostRepository} from './post.repository';
 import {PostEntity} from './post.entity';
 import {POST_NOT_FOUND} from './post.constant';
 import {PostQuery} from './query/post.query';
-import {TagService} from "../tag/tag.service";
-import {CreatePostType} from "./types/create-post.type";
+import {TagService} from '../tag/tag.service';
+import {CreatePostType} from './types/create-post.type';
 
 @Injectable()
 export class PostService {

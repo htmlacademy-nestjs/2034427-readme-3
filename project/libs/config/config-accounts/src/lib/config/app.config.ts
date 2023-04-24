@@ -8,7 +8,7 @@ export interface AccountApplicationConfig {
   port: number;
 }
 
-export default registerAs('accounts-application', (): AccountApplicationConfig => {
+export default registerAs('application', (): AccountApplicationConfig => {
   const config: AccountApplicationConfig = {
     environment: process.env.NODE_ENV,
     port: parseInt(process.env.PORT || DEFAULT_PORT.toString(), 10),

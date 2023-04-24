@@ -1,6 +1,6 @@
 import {Module} from '@nestjs/common';
 import {ConfigModule} from '@nestjs/config';
-import appConfig from './config/app.config';
+import blogConfig from './blog.config';
 
 const ENV_BLOG_FILE_PATH = 'apps/blog/.blog.env';
 
@@ -9,7 +9,7 @@ const ENV_BLOG_FILE_PATH = 'apps/blog/.blog.env';
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true,
-      load: [appConfig],
+      load: [blogConfig],
       envFilePath: ENV_BLOG_FILE_PATH,
     })
   ]

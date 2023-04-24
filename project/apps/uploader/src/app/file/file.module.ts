@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import {FileController} from "./file.controller";
-import {FileService} from "./file.service";
-import {ServeStaticModule} from "@nestjs/serve-static";
-import {ConfigService} from "@nestjs/config";
-import {MongooseModule} from "@nestjs/mongoose";
-import {FileModel, FileSchema} from "./file.model";
-import {FileRepository} from "./file.repository";
+import {FileController} from './file.controller';
+import {FileService} from './file.service';
+import {ServeStaticModule} from '@nestjs/serve-static';
+import {ConfigService} from '@nestjs/config';
+import {MongooseModule} from '@nestjs/mongoose';
+import {FileModel, FileSchema} from './file.model';
+import {FileRepository} from './file.repository';
 
 @Module({
   imports: [

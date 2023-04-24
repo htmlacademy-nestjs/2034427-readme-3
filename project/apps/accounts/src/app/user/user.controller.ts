@@ -1,11 +1,11 @@
 import { Body, Controller, Get, HttpStatus, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { fillObject } from '@project/util/util-core';
+import { MongoidValidationPipe } from '@project/shared/shared-pipes';
 import { UserService } from './user.service';
 import { UserProfileRdo } from './rdo/user-profile.rdo';
 import { UserRdo } from '../auth/rdo/user.rdo';
-import { MongoidValidationPipe } from "@project/shared/shared-pipes";
-import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('Users')
 @Controller('users')

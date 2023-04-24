@@ -26,7 +26,7 @@ async function bootstrap() {
     transform: true,
   }));
 
-  const port = configService.get('blog-application.port');
+  const port = configService.get('application.port');
   await app.listen(port);
 
   Logger.log(
@@ -34,7 +34,7 @@ async function bootstrap() {
   );
 
   Logger.log(
-    `🎯  Current mode: ${configService.get('blog-application.environment')}`
+    `🎯 Current mode: ${configService.get('application.environment')}`
   )
 }
 

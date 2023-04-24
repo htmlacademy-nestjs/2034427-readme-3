@@ -1,7 +1,7 @@
 import {Inject, Injectable, NotFoundException} from '@nestjs/common';
-import {uploaderConfig} from "@project/config/config-uploader";
-import {FileType, IFile} from "@project/shared/app-types";
-import {ConfigType} from "@nestjs/config";
+import {uploaderConfig} from '@project/config/config-uploader';
+import {FileType, IFile} from '@project/shared/app-types';
+import {ConfigType} from '@nestjs/config';
 import { ensureDir } from 'fs-extra';
 import { writeFile } from 'node:fs/promises';
 import { extension } from 'mime-types';
