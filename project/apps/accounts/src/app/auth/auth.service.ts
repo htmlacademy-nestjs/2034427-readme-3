@@ -3,13 +3,13 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ITokenPayload, IUser } from "@project/shared/app-types";
-import { JwtService } from "@nestjs/jwt";
-import { CreateUserDto } from "./dto/create-user.dto";
+import { ITokenPayload, IUser } from '@project/shared/app-types';
+import { JwtService } from '@nestjs/jwt';
+import { CreateUserDto } from './dto/create-user.dto';
 import { AUTH_USER_EXISTS, INVALID_CREDENTIALS } from './auth.constant';
 import { UserEntity } from '../user/user.entity';
 import { LoginUserDto } from './dto/login-user.dto';
-import { UserRepository } from "../user/user.repository";
+import { UserRepository } from '../user/user.repository';
 
 @Injectable()
 export class AuthService {

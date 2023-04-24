@@ -1,7 +1,7 @@
 import {Logger, ValidationPipe} from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
-import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger";
+import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
 import { AppModule } from './app/app.module';
 
 async function bootstrap() {
@@ -24,15 +24,15 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
 
-  const port = configService.get('accounts-application.port');
+  const port = configService.get('application.port');
   await app.listen(port);
 
   Logger.log(
-    `🚀 Accounts Application is running on: http://localhost:${port}/${globalPrefix}`
+    `🚀 Accounts service is running on: http://localhost:${port}/${globalPrefix}`
   );
 
   Logger.log(
-    `🎯  Current mode: ${configService.get('accounts-application.environment')}`
+    `🎯 Current mode: ${configService.get('application.environment')}`
   )
 }
 

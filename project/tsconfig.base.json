@@ -23,6 +23,9 @@
       "@project/config/config-comments": [
         "libs/config/config-comments/src/index.ts"
       ],
+      "@project/config/config-notify": [
+        "libs/config/config-notify/src/index.ts"
+      ],
       "@project/config/config-uploader": [
         "libs/config/config-uploader/src/index.ts"
       ],

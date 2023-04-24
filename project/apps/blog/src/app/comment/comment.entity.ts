@@ -1,5 +1,5 @@
-import {IEntity} from "@project/util/util-types";
-import {IComment} from "@project/shared/app-types";
+import {IEntity} from '@project/util/util-types';
+import {IComment} from '@project/shared/app-types';
 
 export class CommentEntity implements IEntity<CommentEntity>, IComment {
   public id: number;

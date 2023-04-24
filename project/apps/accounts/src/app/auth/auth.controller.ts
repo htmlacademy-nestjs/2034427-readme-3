@@ -6,11 +6,15 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UserRdo } from './rdo/user.rdo';
 import { LoginUserDto } from './dto/login-user.dto';
 import { LoggedUserRdo } from './rdo/logged-user.rdo';
+import {NotifyService} from '../notify/notify.service';
 
 @ApiTags('authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly notifyService: NotifyService,
+  ) {}
 
   @ApiResponse({
     type: UserRdo,
@@ -20,6 +24,8 @@ export class AuthController {
   @Post('register')
   public async create(@Body() dto: CreateUserDto): Promise<UserRdo> {
     const user = await this.authService.register(dto);
+    const {email, firstname, lastname} = user;
+    await this.notifyService.create({email, firstname, lastname});
     return fillObject(UserRdo, user);
   }
 

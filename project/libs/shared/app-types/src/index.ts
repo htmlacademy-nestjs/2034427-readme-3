@@ -5,3 +5,6 @@ export * from './lib/tag.interface';
 export * from './lib/file.type';
 export * from './lib/file.interface';
 export * from './lib/token-payload.interface';
+export * from './lib/rabbit-routing.enum';
+export * from './lib/subscriber.interface';
+export * from './lib/notify-post.interface';

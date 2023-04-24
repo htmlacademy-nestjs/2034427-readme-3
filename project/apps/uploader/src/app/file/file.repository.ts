@@ -1,9 +1,9 @@
-import {Injectable} from "@nestjs/common";
-import {InjectModel} from "@nestjs/mongoose";
-import {Model} from "mongoose";
-import {FileModel} from "./file.model";
-import {FileEntity} from "./file.entity";
-import {IFile} from "@project/shared/app-types";
+import {Injectable} from '@nestjs/common';
+import {InjectModel} from '@nestjs/mongoose';
+import {IFile} from '@project/shared/app-types';
+import {Model} from 'mongoose';
+import {FileModel} from './file.model';
+import {FileEntity} from './file.entity';
 
 @Injectable()
 export class FileRepository {

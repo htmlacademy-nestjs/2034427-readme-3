@@ -1,6 +1,6 @@
 import {Document} from 'mongoose';
-import {IFile} from "@project/shared/app-types";
-import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
+import {IFile} from '@project/shared/app-types';
+import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose';
 
 @Schema({collection: 'files', timestamps: true})
 export class FileModel extends Document implements IFile {
