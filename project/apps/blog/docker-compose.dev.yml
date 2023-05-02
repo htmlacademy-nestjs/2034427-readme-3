@@ -6,7 +6,7 @@ services:
     container_name: readme.blog.postgres
     environment:
       POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
+      POSTGRES_PASSWORD: secret
       POSTGRES_DB: readme-blog
     ports:
       - 5432:5432

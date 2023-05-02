@@ -1,5 +1,4 @@
-import {Controller, Get, Inject, Param, Post, UploadedFile, UseInterceptors} from '@nestjs/common';
-import {FileInterceptor} from '@nestjs/platform-express';
+import {Body, Controller, Get, Inject, Param, Post} from '@nestjs/common';
 import {FileType} from '@project/shared/app-types';
 import {fillObject} from '@project/util/util-core';
 import {uploaderConfig} from '@project/config/config-uploader';
@@ -16,8 +15,7 @@ export class FileController {
   ) {}
 
   @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
-  public async uploadFile(@UploadedFile() file: FileType) {
+  public async uploadFile(@Body() file: FileType) {
     const newFile = await this.fileService.saveFile(file);
     const path = `${this.applicationConfig.serveRoot}${newFile.path}`;
     return fillObject(UploadedFileRdo, Object.assign(newFile, { path }));

@@ -1,9 +1,9 @@
 import {BadRequestException, Injectable} from '@nestjs/common';
 import {ITag} from '@project/shared/app-types';
+import {CreateTagDto} from '@project/shared/dto';
 import {TagRepository} from './tag.repository';
-import {CreateTagDto} from './dto/create-tag.dto';
 import {TagEntity} from './tag.entity';
-import {UpdateTagDto} from './dto/update-tag.dto';
+import {MAX_COUNT_TAGS, MAX_COUNT_TAGS_ERROR} from "./tag.constant";
 
 @Injectable()
 export class TagService {
@@ -25,8 +25,8 @@ export class TagService {
   }
 
   public async findOrCreateTags(tagTitles: string[]): Promise<ITag[]> {
-    if (tagTitles.length > 8) {
-      throw new BadRequestException('tags cannot be more 8');
+    if (tagTitles?.length > MAX_COUNT_TAGS) {
+      throw new BadRequestException(MAX_COUNT_TAGS_ERROR);
     }
     const tags = new Set(tagTitles);
     const tagsList = [];
@@ -44,7 +44,7 @@ export class TagService {
     return this.tagRepository.find();
   }
 
-  public async updateTag(id: number, dto: UpdateTagDto): Promise<ITag> {
+  public async updateTag(id: number, dto: CreateTagDto): Promise<ITag> {
     const tagEntity = new TagEntity(dto);
     return this.tagRepository.update(id, tagEntity);
   }

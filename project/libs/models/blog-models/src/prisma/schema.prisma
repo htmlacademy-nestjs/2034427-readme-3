@@ -24,7 +24,7 @@ model Post {
   quoteAuthor     String?    @map("quote_author")
   tags            Tag[]
   isRepost        Boolean    @default(false) @map("is_repost")
-  originalId      String?    @map("original_id")
+  originalId      Int?       @map("original_id")
   originalAuthor  String?    @map("original_author")
   status          PostStatus @default(publish)
   likeCount       Int        @default(0) @map("like_count")

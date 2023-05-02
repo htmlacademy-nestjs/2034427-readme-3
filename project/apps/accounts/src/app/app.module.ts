@@ -5,6 +5,7 @@ import { getMongooseOptions } from '@project/util/util-core';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { NotifyModule } from './notify/notify.module';
+import { TokenModule } from './token/token.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { NotifyModule } from './notify/notify.module';
     ConfigAccountsModule,
     MongooseModule.forRootAsync(getMongooseOptions('db')),
     NotifyModule,
+    TokenModule,
   ],
   controllers: [],
   providers: [],

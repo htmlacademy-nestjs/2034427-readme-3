@@ -16,7 +16,7 @@ export interface IPost {
   tags: ITag[];
   userId: string;
   isRepost?: boolean;
-  originalId?: string;
+  originalId?: number;
   originalAuthor?: string;
   status?: PostStatus;
   likeCount?: number;

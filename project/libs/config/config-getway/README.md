@@ -1,0 +1,11 @@
+# config-config-getway
+
+This library was generated with [Nx](https://nx.dev).
+
+## Running unit tests
+
+Run `nx test config-config-getway` to execute the unit tests via [Jest](https://jestjs.io).
+
+## Running lint
+
+Run `nx lint config-config-getway` to execute the lint via [ESLint](https://eslint.org/).

@@ -5,8 +5,8 @@ import {getJwtOptions} from '@project/config/config-accounts';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import {UserModule} from '../user/user.module';
-import {JwtAccessStrategy} from './strategies/jwt-access.strategy';
 import {NotifyModule} from '../notify/notify.module';
+import {TokenModule} from '../token/token.module';
 
 @Module({
   imports: [
@@ -16,8 +16,11 @@ import {NotifyModule} from '../notify/notify.module';
       useFactory: getJwtOptions
     }),
     NotifyModule,
+    TokenModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtAccessStrategy],
+  providers: [
+    AuthService,
+  ],
 })
 export class AuthModule {}

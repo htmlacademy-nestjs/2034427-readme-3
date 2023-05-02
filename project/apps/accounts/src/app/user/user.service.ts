@@ -4,6 +4,7 @@ import {UserRepository} from './user.repository';
 import {CAN_BE_EQUAL, USER_NOT_FOUND} from './user.constant';
 import {UserEntity} from './user.entity';
 import {UserProfileType} from './types/user-profile.type';
+import {ChangePasswordDto} from './dto/change-password.dto';
 
 @Injectable()
 export class UserService {
@@ -53,5 +54,30 @@ export class UserService {
 
   public async getAll(): Promise<IUser[]> {
     return this.userRepository.getAll();
+  }
+
+  public async changePassword(changePasswordDto: ChangePasswordDto) {
+    const existUser = await this.getUser(changePasswordDto.currentUserId);
+    const userEntity = new UserEntity(existUser);
+    const isValidOldPassword = await userEntity.comparePassword(changePasswordDto.oldPassword);
+
+    if (!isValidOldPassword) {
+      throw new BadRequestException('Invalid old password');
+    }
+
+    await userEntity.setPassword(changePasswordDto.newPassword);
+    return this.userRepository.update(changePasswordDto.currentUserId, userEntity);
+  }
+
+  public async incPostCount(userId: string) {
+    const user = await this.getUser(userId);
+    user.postCountIncrement();
+    await this.userRepository.update(userId, user);
+  }
+
+  public async decPostCount(userId: string) {
+    const user = await this.getUser(userId);
+    user.postCountDecrement();
+    await this.userRepository.update(userId, user);
   }
 }
