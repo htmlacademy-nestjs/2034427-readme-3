@@ -4,10 +4,10 @@ import {FileType, IFile} from '@project/shared/app-types';
 import {ConfigType} from '@nestjs/config';
 import { ensureDir } from 'fs-extra';
 import { writeFile } from 'node:fs/promises';
+import * as crypto from 'node:crypto';
 import { extension } from 'mime-types';
 import { FileRepository } from './file.repository';
 import { FileEntity } from './file.entity';
-import * as crypto from 'node:crypto';
 import dayjs from 'dayjs';
 
 type WritedFile = {
@@ -60,7 +60,7 @@ export class FileService {
     const destinationFile = `${uploadDirectoryPath}/${hashName}`
 
     await ensureDir(uploadDirectoryPath);
-    await writeFile(destinationFile, file.buffer);
+    await writeFile(destinationFile, Buffer.from(file.buffer));
 
     return {
       hashName,

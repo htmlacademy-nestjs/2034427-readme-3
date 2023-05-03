@@ -16,8 +16,9 @@ export class NotificationRepository {
     return notifyPost.save();
   }
 
-  public async all(): Promise<INotifyPost[]> {
-    return this.notifyModel.find().exec();
+  public async getByUserId(userId: string): Promise<INotifyPost[]> {
+    return this.notifyModel.find({userId})
+      .exec();
   }
 
   public async findByPostId(postId: number): Promise<INotifyPost | null> {

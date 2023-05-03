@@ -16,7 +16,7 @@ export class PostEntity implements IEntity<PostEntity>, IPost {
   public tags: ITag[];
   public userId: string;
   public isRepost?: boolean;
-  public originalId: string;
+  public originalId: number;
   public originalAuthor: string;
   public status: PostStatus;
   public likeCount: number;
@@ -48,5 +48,13 @@ export class PostEntity implements IEntity<PostEntity>, IPost {
 
   public decrementCommentCount() {
     this.commentCount --;
+  }
+
+  public createRepost(userId) {
+    this.originalId = this.postId;
+    this.originalAuthor = this.userId;
+    this.userId = userId;
+    this.isRepost = true;
+    delete this.postId;
   }
 }

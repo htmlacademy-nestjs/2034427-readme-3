@@ -12,9 +12,9 @@ export class MailService {
     private readonly notificationRepository: NotificationRepository,
   ) {}
 
-  public async sendNotify(): Promise<void> {
+  public async sendNotify(userId: string): Promise<void> {
     const subscribers = await this.subscriberRepository.all();
-    const notifyPosts = await this.notificationRepository.all();
+    const notifyPosts = await this.notificationRepository.getByUserId(userId);
 
     if (!notifyPosts.length) {
       return;

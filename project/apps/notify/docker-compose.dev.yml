@@ -38,8 +38,8 @@ services:
     container_name: "readme.notify.fakesmtp"
     hostname: "fakesmtp"
     ports:
-      - 8025:8025
-      - 1083:8080
+      - "8025:8025"
+      - "1083:8080"
 
   readme.notify.mongodb.ui:
     image: mongo-express

@@ -1,14 +1,19 @@
 import {
-  ConflictException,
-  Injectable,
-  UnauthorizedException,
+  BadRequestException,
+  ConflictException, Inject,
+  Injectable, NotFoundException,
+  UnauthorizedException
 } from '@nestjs/common';
-import { ITokenPayload, IUser } from '@project/shared/app-types';
+import {IRefreshTokenPayload, IUser} from '@project/shared/app-types';
 import { JwtService } from '@nestjs/jwt';
-import { CreateUserDto } from './dto/create-user.dto';
-import { AUTH_USER_EXISTS, INVALID_CREDENTIALS } from './auth.constant';
+import {jwtConfig} from '@project/config/config-accounts';
+import {ConfigType} from '@nestjs/config';
+import {createJWTPayload} from '@project/util/util-core';
+import * as crypto from 'node:crypto';
+import {CreateUserDto, LoginUserDto} from '@project/shared/dto';
+import {TokenService} from '../token/token.service';
+import {AUTH_USER_EXISTS, INVALID_CREDENTIALS, INVALID_REFRESH_TOKEN, TOKEN_NOT_FOUND} from './auth.constant';
 import { UserEntity } from '../user/user.entity';
-import { LoginUserDto } from './dto/login-user.dto';
 import { UserRepository } from '../user/user.repository';
 
 @Injectable()
@@ -16,11 +21,13 @@ export class AuthService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
+    @Inject(jwtConfig.KEY) private readonly jwtOptions: ConfigType<typeof jwtConfig>,
+    private readonly tokenService: TokenService,
   ) {}
 
-  public async register({email, firstname, lastname, password}: CreateUserDto): Promise<IUser> {
+  public async register({email, firstname, lastname, password, avatar}: CreateUserDto): Promise<IUser> {
     const user = {
-      email, firstname, lastname, avatar: '', passwordHash: '',
+      email, firstname, lastname, avatar, passwordHash: '',
       postCount: 0, subscribersCount: 0, createdAt: new Date().toISOString(),
     };
 
@@ -53,16 +60,43 @@ export class AuthService {
     return userEntity.toObject();
   }
 
+  public async verifyRefreshToken(refreshToken: string): Promise<IUser> {
+    const payload = await this.getRefreshTokenPayload(refreshToken);
+    const existToken = await this.tokenService.isExist(payload.tokenId);
+
+    if (!existToken) {
+      throw new NotFoundException(TOKEN_NOT_FOUND);
+    }
+
+    await this.tokenService.deleteRefreshSession(payload.tokenId);
+    await this.tokenService.deleteExpiredRefreshTokens();
+
+    const user = await this.userRepository.findById(payload.sub);
+    return new UserEntity(user);
+  }
+
   public async createToken(user: IUser) {
-    const payload: ITokenPayload = {
-      sub: user._id,
-      email: user.email,
-      lastname: user.lastname,
-      firstname: user.firstname,
-    };
+    const accessTokenPayload = createJWTPayload(user);
+    const refreshTokenPayload = {...accessTokenPayload, tokenId: crypto.randomUUID()};
+    await this.tokenService.createRefreshSession(refreshTokenPayload);
 
     return {
-      accessToken: await this.jwtService.signAsync(payload),
+      accessToken: await this.jwtService.signAsync(accessTokenPayload),
+      refreshToken: await this.jwtService.signAsync(refreshTokenPayload, {
+        secret: this.jwtOptions.refreshTokenSecret,
+        expiresIn: this.jwtOptions.refreshTokenExpiresIn,
+      }),
+    }
+  }
+
+
+  private async getRefreshTokenPayload(refreshToken: string): Promise<IRefreshTokenPayload> {
+    try {
+      return this.jwtService.verifyAsync(refreshToken, {
+        secret: this.jwtOptions.refreshTokenSecret,
+      });
+    } catch {
+      throw new BadRequestException(INVALID_REFRESH_TOKEN);
     }
   }
 }

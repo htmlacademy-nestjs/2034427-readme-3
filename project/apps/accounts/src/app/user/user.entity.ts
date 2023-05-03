@@ -64,4 +64,12 @@ export class UserEntity implements IUser {
   public followingDecrement() {
     this.followingCount --;
   }
+
+  public postCountIncrement() {
+    this.postCount ++;
+  }
+
+  public postCountDecrement() {
+    this.postCount --;
+  }
 }

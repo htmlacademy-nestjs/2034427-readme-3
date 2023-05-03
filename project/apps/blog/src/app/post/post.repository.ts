@@ -1,9 +1,10 @@
 import {Injectable} from '@nestjs/common';
 import {ICRUDRepository} from '@project/util/util-types';
 import {IPost} from '@project/shared/app-types';
-import {PostQuery, SortingType} from './query/post.query';
+import {PostStatus} from '@prisma/client';
 import {PostEntity} from './post.entity';
 import {PrismaService} from '../prisma/prisma.service';
+import {PaginationQuery, PostQuery, SortingType} from '@project/shared/dto'
 
 @Injectable()
 export class PostRepository implements ICRUDRepository<PostEntity, number, IPost>{
@@ -31,11 +32,26 @@ export class PostRepository implements ICRUDRepository<PostEntity, number, IPost
     });
   }
 
-  public async destroy(postId: number): Promise<void> {
-    await this.prisma.post.delete({
+  public find(query: PostQuery): Promise<IPost[]> {
+    const {postType, limit, page, sort, direction, status} = query;
+    return this.prisma.post.findMany({
       where: {
-        postId,
-      }
+        AND: [
+          {
+            status: status,
+          },
+          {
+            postType: postType ?? undefined,
+          },
+        ]
+      },
+      include: {
+        tags: true,
+        comments: true,
+      },
+      orderBy: this.getSorting(sort, direction),
+      take: limit,
+      skip: page > 0 ? limit * (page - 1) : undefined,
     });
   }
 
@@ -51,37 +67,72 @@ export class PostRepository implements ICRUDRepository<PostEntity, number, IPost
     });
   }
 
-  public find(query: PostQuery): Promise<IPost[]> {
-    const {userId, tag, postType, limit, page, sort, direction, status} = query;
+  public getByUserId(userId: string, query: PaginationQuery): Promise<IPost[]> {
+    const {limit, page} = query;
+    return this.prisma.post.findMany({
+      where: {
+        userId
+      },
+      include: {
+        tags: true,
+        comments: true,
+      },
+      take: limit,
+      skip: page > 0 ? limit * (page - 1) : undefined,
+    })
+  }
+
+  public async getByTagId(tagId: number, query: PaginationQuery): Promise<IPost[]> {
+    const {limit, page} = query;
+    return this.prisma.post.findMany({
+      where: {
+        tags: {
+          some: {
+            id: tagId,
+          }
+        }
+      },
+      include: {
+        tags: true,
+        comments: true,
+      },
+      take: limit,
+      skip: page > 0 ? limit * (page - 1) : undefined,
+    })
+  }
+
+  public async getDraftByUserId(userId: string): Promise<IPost[]> {
     return this.prisma.post.findMany({
       where: {
         AND: [
           {
-            status: status,
+            userId
           },
           {
-            userId: userId ?? undefined,
-          },
-          {
-            postType: postType ?? undefined,
-          },
-          {
-            tags: {
-              some: {
-                title: tag ?? undefined
-              }
-            }
+            status: PostStatus.draft,
           }
         ]
       },
       include: {
         tags: true,
         comments: true,
-      },
-      orderBy: this.getSorting(sort, direction),
-      take: limit,
-      skip: page > 0 ? limit * (page - 1) : undefined,
-    });
+      }
+    })
+  }
+
+  public async findRepost(originalId: number, userId: string) {
+    return this.prisma.post.findFirst({
+      where: {
+        AND: [
+          {
+            userId,
+          },
+          {
+            originalId,
+          }
+        ]
+      }
+    })
   }
 
   public update(postId: number, item: PostEntity): Promise<IPost> {
@@ -106,16 +157,12 @@ export class PostRepository implements ICRUDRepository<PostEntity, number, IPost
     });
   }
 
-  public getByUserId(userId: string): Promise<IPost[]> {
-    return this.prisma.post.findMany({
+  public async destroy(postId: number): Promise<void> {
+    await this.prisma.post.delete({
       where: {
-        userId
-      },
-      include: {
-        tags: true,
-        comments: true,
+        postId,
       }
-    })
+    });
   }
 
   private getSorting(sort: SortingType, direction: 'desc' | 'asc' = 'desc') {

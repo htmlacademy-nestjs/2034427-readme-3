@@ -1,48 +1,28 @@
 import {Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query} from '@nestjs/common';
-import {ApiResponse, ApiTags} from '@nestjs/swagger';
-import {fillObject} from '@project/util/util-core';
-import {ApiImplicitQuery} from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator';
 import {CommentService} from './comment.service';
 import {CreateCommentDto} from './dto/create-comment.dto';
-import {CommentRdo} from './rdo/comment.rdo';
 import {CommentQuery} from './query/comment.query';
+import {IComment} from "@project/shared/app-types";
 
-@ApiTags('Comments')
 @Controller('comments')
 export class CommentController {
   constructor(
     private readonly commentService: CommentService,
   ) {}
 
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Comments list for post'
-  })
-  @ApiImplicitQuery({name: 'limit', required: false, type: Number})
-  @ApiImplicitQuery({name: 'page', required: false, type: Number})
-  @Get(':id/post')
-  public async getByPost(@Param('id') postId: number, @Query() query: CommentQuery) {
-    const comments = await this.commentService.findByPostId(postId, query);
-    return fillObject(CommentRdo, comments);
+  @Get('post/:id')
+  public async getByPost(@Param('id') postId: number, @Query() query: CommentQuery): Promise<IComment[]> {
+    return this.commentService.findByPostId(postId, query);
   }
 
-  @ApiResponse({
-    status: HttpStatus.CREATED,
-    description: 'Comment has been successfully created'
-  })
   @Post()
-  public async create(@Body() dto: CreateCommentDto) {
-    const comments = await this.commentService.create(dto);
-    return fillObject(CommentRdo, comments);
+  public async create(@Body() dto: CreateCommentDto): Promise<IComment> {
+   return this.commentService.create(dto);
   }
 
-  @ApiResponse({
-    status: HttpStatus.NO_CONTENT,
-    description: 'Comment has been successfully deleted'
-  })
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Delete(':id')
-  public async delete(@Param('id') commentId: number) {
-    return this.commentService.delete(commentId);
+  @Delete(':id/user/:userId')
+  public async delete(@Param('id') commentId: number, @Param('userId') userId: string): Promise<void> {
+    await this.commentService.delete(commentId, userId);
   }
 }

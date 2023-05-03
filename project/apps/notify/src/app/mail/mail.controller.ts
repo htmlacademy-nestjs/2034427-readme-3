@@ -1,4 +1,4 @@
-import {Controller, Get} from '@nestjs/common';
+import {Controller, Get, Param} from '@nestjs/common';
 import {MailService} from './mail.service';
 
 @Controller('mail')
@@ -7,8 +7,8 @@ export class MailController {
     public readonly mailService: MailService,
   ) {}
 
-  @Get()
-  public async sendNotify() {
-    await this.mailService.sendNotify();
+  @Get(':id')
+  public async sendNotify(@Param('id') userId: string) {
+    await this.mailService.sendNotify(userId);
   }
 }

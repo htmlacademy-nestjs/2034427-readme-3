@@ -3,10 +3,10 @@ import {IPost} from '@project/shared/app-types';
 import {PostType} from '@prisma/client';
 import {PostRepository} from './post.repository';
 import {PostEntity} from './post.entity';
-import {POST_NOT_FOUND} from './post.constant';
-import {PostQuery} from './query/post.query';
+import {EXIST_REPOST, IS_AUTHOR, IS_REPOST, NO_AUTHOR, POST_NOT_FOUND} from './post.constant';
 import {TagService} from '../tag/tag.service';
 import {CreatePostType} from './types/create-post.type';
+import {PaginationQuery, PostQuery} from '@project/shared/dto';
 
 @Injectable()
 export class PostService {
@@ -31,8 +31,11 @@ export class PostService {
     return this.postRepository.update(existPost.postId, postEntity);
   }
 
-  public async deletePost(id: number): Promise<void> {
+  public async deletePost(id: number, userId: string): Promise<void> {
     const deletedPost = await this.getPost(id);
+    if (deletedPost.userId !== userId) {
+      throw new BadRequestException(NO_AUTHOR);
+    }
     await this.postRepository.destroy(deletedPost.postId);
   }
 
@@ -40,8 +43,16 @@ export class PostService {
     return this.postRepository.find(query);
   }
 
-  public async getByAuthor(userId: string): Promise<IPost[]> {
-    return this.postRepository.getByUserId(userId);
+  public async getByAuthor(userId: string, query: PaginationQuery): Promise<IPost[]> {
+    return this.postRepository.getByUserId(userId, query);
+  }
+
+  public async getByTagId(tagId: number, query: PaginationQuery) {
+    return this.postRepository.getByTagId(tagId, query);
+  }
+
+  public async getDraft(userId: string): Promise<IPost[]> {
+    return await this.postRepository.getDraftByUserId(userId);
   }
 
   public async getPost(id: number): Promise<PostEntity> {
@@ -50,6 +61,27 @@ export class PostService {
       throw new NotFoundException(POST_NOT_FOUND);
     }
     return new PostEntity(post);
+  }
+
+  public async rePost(postId: number, userId: string) {
+    const originalPost = await this.getPost(postId);
+    if (originalPost.userId === userId) {
+      throw new BadRequestException(IS_AUTHOR)
+    }
+
+    const existRepost = await this.postRepository.findRepost(postId, userId);
+    if (existRepost) {
+      throw new BadRequestException(EXIST_REPOST);
+    }
+
+    if (originalPost.isRepost) {
+      throw new BadRequestException(IS_REPOST);
+    }
+
+    const postEntity = new PostEntity(originalPost);
+    postEntity.createRepost(userId);
+
+    return this.postRepository.create(postEntity);
   }
 
   public async incrementCommentCount(postId: number): Promise<void> {
