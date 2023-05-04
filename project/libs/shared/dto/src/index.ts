@@ -4,3 +4,4 @@ export * from './lib/refresh-token.dto';
 export * from './lib/pagination.query';
 export * from './lib/post.query';
 export * from './lib/create-tag.dto';
+export * from './lib/search.query';

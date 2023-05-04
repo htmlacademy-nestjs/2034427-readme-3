@@ -6,6 +6,7 @@ import {PostService} from '../post/post.service';
 import {PostRepository} from '../post/post.repository';
 import {TagRepository} from '../tag/tag.repository';
 import {TagService} from '../tag/tag.service';
+import {FavoriteRepository} from "../favorite/favorite.repository";
 
 @Module({
   providers: [
@@ -14,7 +15,8 @@ import {TagService} from '../tag/tag.service';
     PostService,
     PostRepository,
     TagRepository,
-    TagService
+    TagService,
+    FavoriteRepository
   ],
   controllers: [CommentController],
 })

@@ -6,13 +6,15 @@ import {PostEntity} from './post.entity';
 import {EXIST_REPOST, IS_AUTHOR, IS_REPOST, NO_AUTHOR, POST_NOT_FOUND} from './post.constant';
 import {TagService} from '../tag/tag.service';
 import {CreatePostType} from './types/create-post.type';
-import {PaginationQuery, PostQuery} from '@project/shared/dto';
+import {PaginationQuery, PostQuery, SearchQuery} from '@project/shared/dto';
+import {FavoriteRepository} from "../favorite/favorite.repository";
 
 @Injectable()
 export class PostService {
   constructor(
     private readonly postRepository: PostRepository,
     private readonly tagService: TagService,
+    private readonly favoriteRepository: FavoriteRepository,
   ) {}
 
   public async createPost(dto: CreatePostType, postType: PostType): Promise<IPost> {
@@ -44,15 +46,23 @@ export class PostService {
   }
 
   public async getByAuthor(userId: string, query: PaginationQuery): Promise<IPost[]> {
-    return this.postRepository.getByUserId(userId, query);
+    return this.postRepository.findByUserId(userId, query);
   }
 
   public async getByTagId(tagId: number, query: PaginationQuery) {
-    return this.postRepository.getByTagId(tagId, query);
+    return this.postRepository.findByTagId(tagId, query);
+  }
+
+  public async getByUserIds(userIds: string[]): Promise<IPost[]> {
+    return this.postRepository.findByUserIds(userIds);
+  }
+
+  public async search({query}: SearchQuery) {
+    return this.postRepository.search(query);
   }
 
   public async getDraft(userId: string): Promise<IPost[]> {
-    return await this.postRepository.getDraftByUserId(userId);
+    return await this.postRepository.findDraftByUserId(userId);
   }
 
   public async getPost(id: number): Promise<PostEntity> {
@@ -82,6 +92,19 @@ export class PostService {
     postEntity.createRepost(userId);
 
     return this.postRepository.create(postEntity);
+  }
+
+  public async favorite(postId: number, userId: string): Promise<IPost> {
+    const post = await this.getPost(postId);
+    const favorite = await this.favoriteRepository.findFavorite(userId, postId);
+    if (favorite) {
+      await this.favoriteRepository.destroy(favorite.favoriteId);
+      post.decrementLikeCount();
+    } else {
+      await this.favoriteRepository.create(userId, postId);
+      post.incrementLikeCount();
+    }
+    return this.postRepository.update(postId, post);
   }
 
   public async incrementCommentCount(postId: number): Promise<void> {

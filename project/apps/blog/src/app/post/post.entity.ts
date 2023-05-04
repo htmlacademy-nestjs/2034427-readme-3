@@ -50,6 +50,14 @@ export class PostEntity implements IEntity<PostEntity>, IPost {
     this.commentCount --;
   }
 
+  public incrementLikeCount() {
+    this.likeCount ++;
+  }
+
+  public decrementLikeCount() {
+    this.likeCount --;
+  }
+
   public createRepost(userId) {
     this.originalId = this.postId;
     this.originalAuthor = this.userId;

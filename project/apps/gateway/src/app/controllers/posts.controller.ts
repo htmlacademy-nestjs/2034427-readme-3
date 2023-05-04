@@ -17,7 +17,7 @@ import {HttpService} from '@nestjs/axios';
 import {FileType, IPost} from '@project/shared/app-types';
 import {ApiImplicitQuery} from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator';
 import {PostStatus, PostType} from '@prisma/client';
-import {PaginationQuery, PostQuery, SortingType} from '@project/shared/dto';
+import {PaginationQuery, PostQuery, SearchQuery, SortingType} from '@project/shared/dto';
 import {fillObject} from '@project/util/util-core';
 import {JwtAuthGuard} from '../guards/jwt-auth.guard';
 import {CreateVideoDto} from '../dto/create-video.dto';
@@ -70,6 +70,37 @@ export class PostsController {
   public async getAll(@Query() query: PostQuery) {
     const {data} = await this.httpService.axiosRef.get(`${ApplicationServiceURL.Posts}`, {params: query});
     return await this.joinUsers(data);
+  }
+
+  @ApiResponse({
+    type: [PostRdo],
+    status: HttpStatus.OK,
+    description: 'Feed posts'
+  })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Get('/feed')
+  public async feed(@UserId() userId: string) {
+    const usersResponse = await this.httpService.axiosRef.get(`${ApplicationServiceURL.Users}/feed/${userId}`);
+    const userIds = usersResponse.data.map((user) => user._id);
+    const {data} = await this.httpService.axiosRef.get(`${ApplicationServiceURL.Posts}/users/`, {params: userIds});
+
+    return data.map((post) => {
+      const user = usersResponse.data.find((user) => user._id === post.userId);
+      const author = fillObject(UserRdo, {...user, id: user._id.toString()});
+      return fillObject(PostRdo, {...post, author});
+    });
+  }
+
+  @ApiResponse({
+    type: [PostRdo],
+    status: HttpStatus.OK,
+    description: 'found posts'
+  })
+  @Get('search')
+  public async search(@Query() query: SearchQuery) {
+    const {data} = await this.httpService.axiosRef.get(`${ApplicationServiceURL.Posts}/search`, {params: query});
+    return this.joinUsers(data);
   }
 
   @ApiResponse({
@@ -225,6 +256,20 @@ export class PostsController {
   }
 
   @ApiResponse({
+    type: PostRdo,
+    status: HttpStatus.OK,
+    description: 'Added or removed post like'
+  })
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Post(':id/favorite')
+  public async favorite(@Param('id') postId: number, @UserId() userId: string) {
+    const {data} = await this.httpService.axiosRef.post(`${ApplicationServiceURL.Posts}/${postId}/favorite`, {userId});
+    return this.joinUser(data);
+  }
+
+  @ApiResponse({
     type: [PostRdo],
     status: HttpStatus.OK,
     description: 'Draft posts list'
@@ -299,8 +344,10 @@ export class PostsController {
   }
 
   private async joinUsers(posts: IPost[]) {
-    const usersResponse = await this.httpService.axiosRef.get(`${ApplicationServiceURL.Users}`);
-    return posts.map((post) => {
+    const usersResponse = await this.httpService.axiosRef.get(`${ApplicationServiceURL.Users}/ids`, {
+      params: [...new Set(posts.map((post) => post.userId))],
+    });
+    return posts.map((post: IPost) => {
       const user = usersResponse.data.find((user) => user._id === post.userId);
       const author = fillObject(UserRdo, {...user, id: user._id.toString()});
       return fillObject(PostRdo, {...post, author});

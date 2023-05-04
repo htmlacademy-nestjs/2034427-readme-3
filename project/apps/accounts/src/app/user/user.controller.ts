@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Param, Patch, Post} from '@nestjs/common';
+import {Body, Controller, Get, Param, Patch, Post, Query} from '@nestjs/common';
 import { MongoidValidationPipe } from '@project/shared/shared-pipes';
 import {IUser} from '@project/shared/app-types';
 import { UserService } from './user.service';
@@ -13,6 +13,16 @@ export class UserController {
   @Get()
   public async all(): Promise<IUser[]> {
     return await this.userService.getAll();
+  }
+
+  @Get('ids')
+  public async allByIds(@Query() query: object): Promise<IUser[]> {
+    return this.userService.findByIds(Object.values(query));
+  }
+
+  @Get('feed/:id')
+  public async getFeedUsers(@Param('id') userId: string): Promise<IUser[]> {
+    return this.userService.getFeedUsers(userId);
   }
 
   @Post('follow/:id')

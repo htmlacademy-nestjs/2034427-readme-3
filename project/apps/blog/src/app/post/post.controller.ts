@@ -9,6 +9,7 @@ import {CreateQuoteDto} from './dto/create-quote.dto';
 import {CreatePhotoDto} from './dto/create-photo.dto';
 import {CreateLinkDto} from './dto/create-link.dto';
 import {NotifyService} from '../notify/notify.service';
+import {SearchQuery} from "../../../../../libs/shared/dto/src/lib/search.query";
 
 @Controller('posts')
 export class PostController {
@@ -88,6 +89,16 @@ export class PostController {
     return this.postService.getAll(query);
   }
 
+  @Get('users')
+  public async findByUsers(@Query() query) {
+    return this.postService.getByUserIds(Object.values(query));
+  }
+
+  @Get('search')
+  public async search(@Query() query: SearchQuery) {
+    return this.postService.search(query);
+  }
+
   @Get(':id')
   public async show(@Param('id') postId: number): Promise<IPost> {
     return this.postService.getPost(postId);
@@ -106,6 +117,11 @@ export class PostController {
   @Post('repost/:id')
   public async rePost(@Param('id') postId: number, @Body() {userId}: {userId: string}): Promise<IPost> {
     return this.postService.rePost(postId, userId);
+  }
+
+  @Post(':id/favorite')
+  public async favorite(@Param('id') postId: number, @Body() {userId}: {userId: string}): Promise<IPost> {
+    return this.postService.favorite(postId, userId);
   }
 
   @Get('draft/user/:id')

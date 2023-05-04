@@ -6,6 +6,8 @@ import {PostEntity} from './post.entity';
 import {PrismaService} from '../prisma/prisma.service';
 import {PaginationQuery, PostQuery, SortingType} from '@project/shared/dto'
 
+const SEARCH_MAX_RESULTS = 20;
+
 @Injectable()
 export class PostRepository implements ICRUDRepository<PostEntity, number, IPost>{
   constructor(
@@ -32,7 +34,7 @@ export class PostRepository implements ICRUDRepository<PostEntity, number, IPost
     });
   }
 
-  public find(query: PostQuery): Promise<IPost[]> {
+  public async find(query: PostQuery): Promise<IPost[]> {
     const {postType, limit, page, sort, direction, status} = query;
     return this.prisma.post.findMany({
       where: {
@@ -67,11 +69,14 @@ export class PostRepository implements ICRUDRepository<PostEntity, number, IPost
     });
   }
 
-  public getByUserId(userId: string, query: PaginationQuery): Promise<IPost[]> {
+  public async findByUserId(userId: string, query: PaginationQuery): Promise<IPost[]> {
     const {limit, page} = query;
     return this.prisma.post.findMany({
       where: {
-        userId
+        AND: [
+          {userId},
+          {status: PostStatus.publish},
+        ]
       },
       include: {
         tags: true,
@@ -82,15 +87,29 @@ export class PostRepository implements ICRUDRepository<PostEntity, number, IPost
     })
   }
 
-  public async getByTagId(tagId: number, query: PaginationQuery): Promise<IPost[]> {
+  public async findByUserIds(userIds: string[]): Promise<IPost[]> {
+    return this.prisma.post.findMany({
+      where: {
+        AND: [
+          {userId: {in: userIds}},
+          {status: PostStatus.publish},
+        ]
+      },
+      include: {
+        tags: true,
+        comments: true,
+      },
+    })
+  }
+
+  public async findByTagId(tagId: number, query: PaginationQuery): Promise<IPost[]> {
     const {limit, page} = query;
     return this.prisma.post.findMany({
       where: {
-        tags: {
-          some: {
-            id: tagId,
-          }
-        }
+        AND: [
+          {status: PostStatus.publish},
+          {tags: {some: {id: tagId}}}
+        ]
       },
       include: {
         tags: true,
@@ -101,7 +120,7 @@ export class PostRepository implements ICRUDRepository<PostEntity, number, IPost
     })
   }
 
-  public async getDraftByUserId(userId: string): Promise<IPost[]> {
+  public async findDraftByUserId(userId: string): Promise<IPost[]> {
     return this.prisma.post.findMany({
       where: {
         AND: [
@@ -135,7 +154,23 @@ export class PostRepository implements ICRUDRepository<PostEntity, number, IPost
     })
   }
 
-  public update(postId: number, item: PostEntity): Promise<IPost> {
+  public async search(title: string): Promise<IPost[]> {
+    return this.prisma.post.findMany({
+      where: {
+        AND: [
+          {title: {contains: title, mode: 'insensitive'}},
+          {status: PostStatus.publish}
+        ]
+      },
+      include: {
+        tags: true,
+        comments: true,
+      },
+      take: SEARCH_MAX_RESULTS,
+    })
+  }
+
+  public async update(postId: number, item: PostEntity): Promise<IPost> {
     const entityData = item.toObject();
     return this.prisma.post.update({
       where: {postId},

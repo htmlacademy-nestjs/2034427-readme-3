@@ -52,8 +52,19 @@ export class UserService {
     return new UserEntity(existUser);
   }
 
+  public async findByIds(userIds: string[]) {
+    return this.userRepository.findByIds(userIds);
+  }
+
   public async getAll(): Promise<IUser[]> {
     return this.userRepository.getAll();
+  }
+
+  public async getFeedUsers(userId: string) {
+    const currentUser = await this.getUser(userId);
+    const subscribe = currentUser.followers
+    subscribe.push(currentUser._id);
+    return this.findByIds(subscribe);
   }
 
   public async changePassword(changePasswordDto: ChangePasswordDto) {

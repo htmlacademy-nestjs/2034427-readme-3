@@ -31,13 +31,18 @@ export class UserRepository implements ICRUDRepository<UserEntity, string, IUser
       .exec();
   }
 
+  public async getAll(): Promise<IUser[]> {
+    return this.userModel.find().exec();
+  }
+
+  public async findByIds(userIds: string[]): Promise<IUser[]> {
+    return this.userModel.find({_id: {$in: userIds}})
+      .exec();
+  }
+
   public async update(id: string, item: UserEntity): Promise<IUser> {
     return this.userModel
       .findByIdAndUpdate(id, item.toObject(), {new: true})
       .exec();
-  }
-
-  public async getAll(): Promise<IUser[]> {
-    return this.userModel.find().exec();
   }
 }

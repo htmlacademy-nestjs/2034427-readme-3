@@ -16,13 +16,12 @@ async function bootstrap() {
 
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
+  app.useGlobalPipes(new ValidationPipe());
 
   const configService = app.get(ConfigService);
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('spec', app, document);
-
-  app.useGlobalPipes(new ValidationPipe());
 
   const port = configService.get('application.port');
   await app.listen(port);
@@ -30,7 +29,6 @@ async function bootstrap() {
   Logger.log(
     `🚀 Accounts service is running on: http://localhost:${port}/${globalPrefix}`
   );
-
   Logger.log(
     `🎯 Current mode: ${configService.get('application.environment')}`
   )
