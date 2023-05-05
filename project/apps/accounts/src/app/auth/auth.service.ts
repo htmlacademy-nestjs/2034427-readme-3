@@ -1,7 +1,8 @@
 import {
   BadRequestException,
-  ConflictException, Inject,
-  Injectable, NotFoundException,
+  Inject,
+  Injectable,
+  NotFoundException,
   UnauthorizedException
 } from '@nestjs/common';
 import {IRefreshTokenPayload, IUser} from '@project/shared/app-types';
@@ -21,8 +22,8 @@ export class AuthService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
-    @Inject(jwtConfig.KEY) private readonly jwtOptions: ConfigType<typeof jwtConfig>,
     private readonly tokenService: TokenService,
+    @Inject(jwtConfig.KEY) private readonly jwtOptions: ConfigType<typeof jwtConfig>,
   ) {}
 
   public async register({email, firstname, lastname, password, avatar}: CreateUserDto): Promise<IUser> {
@@ -34,7 +35,7 @@ export class AuthService {
     const existUser = await this.userRepository.findByEmail(email);
 
     if (existUser) {
-      throw new ConflictException(AUTH_USER_EXISTS);
+      throw new BadRequestException(AUTH_USER_EXISTS);
     }
 
     const userEntity = await new UserEntity(user)
@@ -89,13 +90,12 @@ export class AuthService {
     }
   }
 
-
   private async getRefreshTokenPayload(refreshToken: string): Promise<IRefreshTokenPayload> {
     try {
       return this.jwtService.verifyAsync(refreshToken, {
         secret: this.jwtOptions.refreshTokenSecret,
       });
-    } catch {
+    } catch (err) {
       throw new BadRequestException(INVALID_REFRESH_TOKEN);
     }
   }

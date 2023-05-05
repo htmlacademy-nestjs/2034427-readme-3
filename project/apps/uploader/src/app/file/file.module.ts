@@ -3,12 +3,16 @@ import {FileController} from './file.controller';
 import {FileService} from './file.service';
 import {ServeStaticModule} from '@nestjs/serve-static';
 import {ConfigService} from '@nestjs/config';
-import {MongooseModule} from '@nestjs/mongoose';
-import {FileModel, FileSchema} from './file.model';
-import {FileRepository} from './file.repository';
+import {FileSubscriber} from './file.subscriber';
+import {RabbitMQModule} from '@golevelup/nestjs-rabbitmq';
+import {getRabbitMQOptions} from '@project/util/util-core';
 
 @Module({
   imports: [
+    RabbitMQModule.forRootAsync(
+      RabbitMQModule,
+      getRabbitMQOptions('application.rabbit')
+    ),
     ServeStaticModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
@@ -23,9 +27,8 @@ import {FileRepository} from './file.repository';
         }]
       }
     }),
-    MongooseModule.forFeature([{name: FileModel.name, schema: FileSchema}]),
   ],
-  providers: [FileService, FileRepository],
-  controllers: [FileController],
+  providers: [FileService],
+  controllers: [FileController, FileSubscriber],
 })
 export class FileModule {}

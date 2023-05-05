@@ -1,16 +1,15 @@
 import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
 import {IUser} from '@project/shared/app-types';
 import {UserRepository} from './user.repository';
-import {CAN_BE_EQUAL, USER_NOT_FOUND} from './user.constant';
+import {CAN_BE_EQUAL, INVALID_OLD_PASSWORD, USER_NOT_FOUND} from './user.constant';
 import {UserEntity} from './user.entity';
-import {UserProfileType} from './types/user-profile.type';
 import {ChangePasswordDto} from './dto/change-password.dto';
 
 @Injectable()
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  public async follow(id: string, currentUserId: string): Promise<UserProfileType> {
+  public async follow(id: string, currentUserId: string): Promise<IUser> {
     if (currentUserId === id) {
       throw new BadRequestException(CAN_BE_EQUAL);
     }
@@ -29,8 +28,7 @@ export class UserService {
 
       await this.userRepository.update(id, userEntity);
       await this.userRepository.update(currentUserId, currentUserEntity);
-
-      return {...userEntity, isFollow: false};
+      return userEntity;
     }
 
     userEntity.following.push(currentUserEntity._id);
@@ -40,8 +38,7 @@ export class UserService {
 
     await this.userRepository.update(id, userEntity);
     await this.userRepository.update(currentUserId, currentUserEntity);
-
-    return {...userEntity, isFollow: true};
+    return userEntity;
   }
 
   public async getUser(id: string): Promise<UserEntity> {
@@ -68,16 +65,16 @@ export class UserService {
   }
 
   public async changePassword(changePasswordDto: ChangePasswordDto) {
-    const existUser = await this.getUser(changePasswordDto.currentUserId);
+    const existUser = await this.getUser(changePasswordDto.userId);
     const userEntity = new UserEntity(existUser);
     const isValidOldPassword = await userEntity.comparePassword(changePasswordDto.oldPassword);
 
     if (!isValidOldPassword) {
-      throw new BadRequestException('Invalid old password');
+      throw new BadRequestException(INVALID_OLD_PASSWORD);
     }
 
     await userEntity.setPassword(changePasswordDto.newPassword);
-    return this.userRepository.update(changePasswordDto.currentUserId, userEntity);
+    return this.userRepository.update(changePasswordDto.userId, userEntity);
   }
 
   public async incPostCount(userId: string) {

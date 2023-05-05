@@ -19,4 +19,12 @@ export class NotifyService {
       {postId, userId, title, postType}
     )
   }
+
+  public async deletePhoto(photoPath: string) {
+    return this.rabbitClient.publish(
+      this.rabbiOptions.rabbit.exchange,
+      RabbitRouting.DeletePhoto,
+      photoPath
+    )
+  }
 }

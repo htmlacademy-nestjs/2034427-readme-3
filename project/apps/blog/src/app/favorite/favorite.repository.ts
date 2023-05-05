@@ -17,7 +17,7 @@ export class FavoriteRepository {
     });
   }
 
-  public async findFavorite(userId: string, postId: number): Promise<IFavorite> {
+  public async findFavorite(userId: string, postId: number): Promise<IFavorite | null> {
     return this.prisma.favorite.findFirst({
       where: {
         AND: [

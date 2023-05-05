@@ -4,9 +4,9 @@ import { PostService } from './post.service';
 import {PostRepository} from './post.repository';
 import {TagService} from '../tag/tag.service';
 import {NotifyModule} from '../notify/notify.module';
-import {TagModule} from "../tag/tag.module";
-import {FavoriteModule} from "../favorite/favorite.module";
-import {FavoriteRepository} from "../favorite/favorite.repository";
+import {TagModule} from '../tag/tag.module';
+import {FavoriteModule} from '../favorite/favorite.module';
+import {FavoriteRepository} from '../favorite/favorite.repository';
 
 @Module({
   imports: [

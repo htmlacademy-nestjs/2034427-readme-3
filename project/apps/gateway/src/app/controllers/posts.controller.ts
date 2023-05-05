@@ -2,35 +2,46 @@ import {
   Body,
   Controller,
   Delete,
+  FileTypeValidator,
   Get,
   HttpCode,
   HttpStatus,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   Patch,
   Post,
-  Query, UploadedFile,
-  UseGuards, UseInterceptors
+  Query,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors
 } from '@nestjs/common';
-import {ApiBearerAuth, ApiResponse, ApiTags} from '@nestjs/swagger';
-import {FileInterceptor} from "@nestjs/platform-express";
+import {ApiBearerAuth, ApiConsumes, ApiResponse, ApiTags} from '@nestjs/swagger';
+import {FileInterceptor} from '@nestjs/platform-express';
 import {HttpService} from '@nestjs/axios';
 import {FileType, IPost} from '@project/shared/app-types';
 import {ApiImplicitQuery} from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator';
 import {PostStatus, PostType} from '@prisma/client';
-import {PaginationQuery, PostQuery, SearchQuery, SortingType} from '@project/shared/dto';
+import {
+  PaginationQuery,
+  PostLinkDto,
+  PostPhotoDto,
+  PostQuery,
+  PostQuoteDto,
+  PostTextDto,
+  PostVideoDto,
+  SearchQuery,
+  SortingType
+} from '@project/shared/dto';
 import {fillObject} from '@project/util/util-core';
 import {JwtAuthGuard} from '../guards/jwt-auth.guard';
-import {CreateVideoDto} from '../dto/create-video.dto';
 import {UserId} from '../decorators/user-id.decorator';
 import {ApplicationServiceURL} from '../app.config';
-import {CreateTextDto} from '../dto/create-text.dto';
-import {CreateQuoteDto} from '../dto/create-quote.dto';
-import {CreatePhotoDto} from '../dto/create-photo.dto';
-import {CreateLinkDto} from '../dto/create-link.dto';
 import {PostRdo} from '../rdo/post.rdo';
 import {UserRdo} from '../rdo/user.rdo';
 import {PostDetailsRdo} from '../rdo/post-details.rdo';
-
+import {CommentRdo} from '../rdo/comment.rdo';
+import {PostWithStatusRdo} from '../rdo/post-with-status.rdo';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -97,6 +108,7 @@ export class PostsController {
     status: HttpStatus.OK,
     description: 'found posts'
   })
+  @ApiImplicitQuery({name: 'query', required: true, type: String})
   @Get('search')
   public async search(@Query() query: SearchQuery) {
     const {data} = await this.httpService.axiosRef.get(`${ApplicationServiceURL.Posts}/search`, {params: query});
@@ -111,7 +123,7 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Post('video')
-  public async createVideo(@Body() dto: CreateVideoDto, @UserId() userId: string) {
+  public async createVideo(@Body() dto: PostVideoDto, @UserId() userId: string) {
     const {data} = await this.httpService.axiosRef.post(`${ApplicationServiceURL.Posts}/video`, {...dto, userId});
     await this.httpService.axiosRef.get(`${ApplicationServiceURL.Users}/${userId}/post-count/inc`);
     return await this.joinUser(data);
@@ -125,7 +137,7 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Post('text')
-  public async createText(@Body() dto: CreateTextDto, @UserId() userId: string) {
+  public async createText(@Body() dto: PostTextDto, @UserId() userId: string) {
     const {data} = await this.httpService.axiosRef.post(`${ApplicationServiceURL.Posts}/text`, {...dto, userId});
     await this.httpService.axiosRef.get(`${ApplicationServiceURL.Users}/${userId}/post-count/inc`);
     return await this.joinUser(data);
@@ -139,7 +151,7 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Post('quote')
-  public async createQuote(@Body() dto: CreateQuoteDto, @UserId() userId: string) {
+  public async createQuote(@Body() dto: PostQuoteDto, @UserId() userId: string) {
     const {data} = await this.httpService.axiosRef.post(`${ApplicationServiceURL.Posts}/quote`, {...dto, userId});
     await this.httpService.axiosRef.get(`${ApplicationServiceURL.Users}/${userId}/post-count/inc`);
     return await this.joinUser(data);
@@ -150,14 +162,27 @@ export class PostsController {
     status: HttpStatus.CREATED,
     description: 'Post has been successfully created'
   })
+  @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('photo'))
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Post('photo')
-  public async createPhoto(@Body() dto: CreatePhotoDto, @UserId() userId: string, @UploadedFile() photo: FileType) {
-    const response = await this.httpService.axiosRef.post(`${ApplicationServiceURL.Uploader}/upload`, photo)
+  public async createPhoto(
+    @Body() dto: PostPhotoDto,
+    @UserId() userId: string,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({maxSize: 1024 * 1024}),
+          new FileTypeValidator({fileType: '.(png|jpeg|jpg)'})
+        ],
+        fileIsRequired: true
+      })
+    ) photo: FileType
+  ) {
+    const uploaderResponse = await this.httpService.axiosRef.post(`${ApplicationServiceURL.Uploader}/upload`, photo)
     const {data} = await this.httpService.axiosRef.post(
-      `${ApplicationServiceURL.Posts}/photo`, {...dto, userId, photo: response.data.path}
+      `${ApplicationServiceURL.Posts}/photo`, {...dto, userId, photo: uploaderResponse.data}
     );
     await this.httpService.axiosRef.get(`${ApplicationServiceURL.Users}/${userId}/post-count/inc`);
     return await this.joinUser(data);
@@ -171,7 +196,7 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Post('link')
-  public async createLink(@Body() dto: CreateLinkDto, @UserId() userId: string) {
+  public async createLink(@Body() dto: PostLinkDto, @UserId() userId: string) {
     const {data} = await this.httpService.axiosRef.post(`${ApplicationServiceURL.Posts}/link`, {...dto, userId});
     await this.httpService.axiosRef.get(`${ApplicationServiceURL.Users}/${userId}/post-count/inc`);
     return await this.joinUser(data);
@@ -185,7 +210,7 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Patch(':id/video')
-  public async updateVideo(@Param('id') postId: number, @Body() dto: CreateVideoDto, @UserId() userId: string) {
+  public async updateVideo(@Param('id') postId: number, @Body() dto: PostVideoDto, @UserId() userId: string) {
     const {data} = await this.httpService.axiosRef.patch(`${ApplicationServiceURL.Posts}/${postId}/video`, {...dto, userId});
     return await this.joinUser(data);
   }
@@ -198,7 +223,7 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Patch(':id/text')
-  public async updateText(@Param('id') postId: number, @Body() dto: CreateTextDto, @UserId() userId: string) {
+  public async updateText(@Param('id') postId: number, @Body() dto: PostTextDto, @UserId() userId: string) {
     const {data} = await this.httpService.axiosRef.patch(`${ApplicationServiceURL.Posts}/${postId}/text`, {...dto, userId});
     return await this.joinUser(data);
   }
@@ -211,7 +236,7 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Patch(':id/quote')
-  public async updateQuote(@Param('id') postId: number, @Body() dto: CreateQuoteDto, @UserId() userId: string) {
+  public async updateQuote(@Param('id') postId: number, @Body() dto: PostQuoteDto, @UserId() userId: string) {
     const {data} = await this.httpService.axiosRef.patch(`${ApplicationServiceURL.Posts}/${postId}/quote`, {...dto, userId});
     return await this.joinUser(data);
   }
@@ -221,12 +246,32 @@ export class PostsController {
     status: HttpStatus.OK,
     description: 'Post has been successfully updated'
   })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('photo'))
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Patch(':id/photo')
-  public async updatePhoto(@Param('id') postId: number, @Body() dto: CreatePhotoDto, @UserId() userId: string) {
-    const {data} = await this.httpService.axiosRef.patch(`${ApplicationServiceURL.Posts}/${postId}/photo`, {...dto, userId});
-    return await this.joinUser(data);
+  public async updatePhoto(
+    @Param('id') postId: number,
+    @Body() dto: PostPhotoDto,
+    @UserId() userId: string,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({maxSize: 1024 * 1024}),
+          new FileTypeValidator({fileType: '.(png|jpeg|jpg)'})
+        ],
+        fileIsRequired: false
+      })
+    ) photo: FileType
+  ) {
+    const uploaderResponse = photo ? await this.httpService.axiosRef.post(`${ApplicationServiceURL.Uploader}/upload`, photo) : null;
+    const {data} = await this.httpService.axiosRef.patch(
+      `${ApplicationServiceURL.Posts}/${postId}/photo`,
+      {...dto, userId, photo: uploaderResponse?.data}
+    );
+    const photoImg = uploaderResponse?.data ?? data.photo;
+    return this.joinUser({...data, photo: photoImg});
   }
 
   @ApiResponse({
@@ -237,7 +282,7 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Patch(':id/link')
-  public async updateLink(@Param('id') postId: number, @Body() dto: CreateLinkDto, @UserId() userId: string) {
+  public async updateLink(@Param('id') postId: number, @Body() dto: PostLinkDto, @UserId() userId: string) {
     const {data} = await this.httpService.axiosRef.patch(`${ApplicationServiceURL.Posts}/${postId}/link`, {...dto, userId});
     return await this.joinUser(data);
   }
@@ -283,7 +328,7 @@ export class PostsController {
   }
 
   @ApiResponse({
-    type: PostRdo,
+    type: PostDetailsRdo,
     status: HttpStatus.OK,
     description: 'Post found'
   })
@@ -324,6 +369,21 @@ export class PostsController {
   }
 
   @ApiResponse({
+    type: PostWithStatusRdo,
+    status: HttpStatus.OK,
+    description: 'Status switched'
+  })
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Post(':id/status')
+  public async changeStatus(@Param('id') postId: number, @UserId() userId: string): Promise<PostWithStatusRdo> {
+    const {data} = await this.httpService.axiosRef.post(`${ApplicationServiceURL.Posts}/${postId}/status`, {userId});
+    const changedPost = await this.joinUser(data);
+    return {...changedPost, status: data.status}
+  }
+
+  @ApiResponse({
     type: PostRdo,
     status: HttpStatus.CREATED,
     description: 'Repost has been successfully created'
@@ -340,7 +400,7 @@ export class PostsController {
     const {data} = await this.httpService.axiosRef.get(`${ApplicationServiceURL.Users}/${post.userId}`);
     const author = fillObject(UserRdo, {...data, id: data._id.toString()});
     const rdo = details ? PostDetailsRdo : PostRdo;
-    return fillObject(rdo, {...post, author});
+    return fillObject(rdo, {...post, author, comments: fillObject(CommentRdo, post.comments)});
   }
 
   private async joinUsers(posts: IPost[]) {

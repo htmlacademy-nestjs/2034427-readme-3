@@ -22,7 +22,10 @@ export class TagRepository implements ICRUDRepository<TagEntity, number, ITag> {
 
   public async findById(id: number): Promise<ITag | null> {
     return this.prisma.tag.findFirst({
-      where: {id}
+      where: {id},
+      include: {
+        posts: true
+      }
     });
   }
 

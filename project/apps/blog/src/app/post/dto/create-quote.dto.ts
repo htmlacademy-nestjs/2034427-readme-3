@@ -1,18 +1,8 @@
-import {IsArray, IsNotEmpty, IsOptional, IsString} from 'class-validator';
+import {IsNotEmpty, IsString} from 'class-validator';
+import {PostQuoteDto} from '@project/shared/dto';
 
-export class CreateQuoteDto {
+export class CreateQuoteDto extends PostQuoteDto{
   @IsString()
   @IsNotEmpty()
-  public text: string;
-
-  @IsString()
-  @IsNotEmpty()
-  public quoteAuthor: string;
-
-  @IsArray()
-  @IsOptional()
-  public tags: string[];
-
-  @IsString()
   public userId: string;
 }

@@ -1,6 +1,6 @@
 import {Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query} from '@nestjs/common';
 import {PostType} from '@prisma/client';
-import {PaginationQuery, PostQuery} from '@project/shared/dto';
+import {PaginationQuery, PostQuery, SearchQuery, UserIdDto} from '@project/shared/dto';
 import {IPost} from '@project/shared/app-types';
 import {PostService} from './post.service';
 import {CreateVideoDto} from './dto/create-video.dto';
@@ -8,49 +8,37 @@ import {CreateTextDto} from './dto/create-text.dto';
 import {CreateQuoteDto} from './dto/create-quote.dto';
 import {CreatePhotoDto} from './dto/create-photo.dto';
 import {CreateLinkDto} from './dto/create-link.dto';
-import {NotifyService} from '../notify/notify.service';
-import {SearchQuery} from "../../../../../libs/shared/dto/src/lib/search.query";
+import {UpdatePhotoDto} from './dto/update-photo.dto';
 
 @Controller('posts')
 export class PostController {
   constructor(
     private readonly postService: PostService,
-    private readonly notifyService: NotifyService,
   ) {}
 
   @Post('video')
   public async createVideo(@Body() dto: CreateVideoDto): Promise<IPost> {
-    const newPost = await this.postService.createPost(dto, PostType.video);
-    await this.notifyService.register(newPost);
-    return newPost;
+    return  this.postService.createPost(dto, PostType.video);
   }
 
   @Post('text')
   public async createText(@Body() dto: CreateTextDto): Promise<IPost> {
-    const newPost = await this.postService.createPost(dto, PostType.text);
-    await this.notifyService.register(newPost);
-    return newPost;
+    return this.postService.createPost(dto, PostType.text);
   }
 
   @Post('quote')
   public async createQuote(@Body() dto: CreateQuoteDto): Promise<IPost> {
-    const newPost = await this.postService.createPost(dto, PostType.quote);
-    await this.notifyService.register(newPost);
-    return newPost;
+    return this.postService.createPost(dto, PostType.quote);
   }
 
   @Post('photo')
   public async createPhoto(@Body() dto: CreatePhotoDto): Promise<IPost> {
-    const newPost = await this.postService.createPost(dto, PostType.photo);
-    await this.notifyService.register(newPost);
-    return newPost;
+    return await this.postService.createPost(dto, PostType.photo);
   }
 
   @Post('link')
   public async createLink(@Body() dto: CreateLinkDto): Promise<IPost> {
-    const newPost = await this.postService.createPost(dto, PostType.link);
-    await this.notifyService.register(newPost);
-    return newPost;
+    return this.postService.createPost(dto, PostType.link);
   }
 
   @Patch(':id/video')
@@ -69,7 +57,7 @@ export class PostController {
   }
 
   @Patch(':id/photo')
-  public async updatePhoto(@Param('id') postId: number, @Body() dto: CreatePhotoDto): Promise<IPost> {
+  public async updatePhoto(@Param('id') postId: number, @Body() dto: UpdatePhotoDto): Promise<IPost> {
     return this.postService.updatePost(postId, dto, PostType.photo);
   }
 
@@ -90,7 +78,7 @@ export class PostController {
   }
 
   @Get('users')
-  public async findByUsers(@Query() query) {
+  public async findByUsers(@Query() query: string[]) {
     return this.postService.getByUserIds(Object.values(query));
   }
 
@@ -114,13 +102,20 @@ export class PostController {
     return this.postService.getByTagId(tagId, query);
   }
 
+  @HttpCode(HttpStatus.OK)
+  @Post(':id/status')
+  public async changeStatus(@Param('id') postId: number, @Body() {userId}: UserIdDto) {
+    return this.postService.changeStatus(postId, userId);
+  }
+
   @Post('repost/:id')
-  public async rePost(@Param('id') postId: number, @Body() {userId}: {userId: string}): Promise<IPost> {
+  public async rePost(@Param('id') postId: number, @Body() {userId}: UserIdDto): Promise<IPost> {
     return this.postService.rePost(postId, userId);
   }
 
+  @HttpCode(HttpStatus.OK)
   @Post(':id/favorite')
-  public async favorite(@Param('id') postId: number, @Body() {userId}: {userId: string}): Promise<IPost> {
+  public async favorite(@Param('id') postId: number, @Body() {userId}: UserIdDto): Promise<IPost> {
     return this.postService.favorite(postId, userId);
   }
 

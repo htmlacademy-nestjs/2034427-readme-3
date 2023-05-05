@@ -1,8 +1,8 @@
 import {Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query} from '@nestjs/common';
+import {IComment} from '@project/shared/app-types';
+import {PaginationQuery} from '@project/shared/dto';
 import {CommentService} from './comment.service';
 import {CreateCommentDto} from './dto/create-comment.dto';
-import {CommentQuery} from './query/comment.query';
-import {IComment} from "@project/shared/app-types";
 
 @Controller('comments')
 export class CommentController {
@@ -11,7 +11,7 @@ export class CommentController {
   ) {}
 
   @Get('post/:id')
-  public async getByPost(@Param('id') postId: number, @Query() query: CommentQuery): Promise<IComment[]> {
+  public async getByPost(@Param('id') postId: number, @Query() query: PaginationQuery): Promise<IComment[]> {
     return this.commentService.findByPostId(postId, query);
   }
 

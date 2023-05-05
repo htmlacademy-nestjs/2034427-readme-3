@@ -1,15 +1,8 @@
 import {IsNotEmpty, IsString} from "class-validator";
+import {PasswordChangeDto} from "@project/shared/dto";
 
-export class ChangePasswordDto {
+export class ChangePasswordDto extends PasswordChangeDto{
   @IsNotEmpty()
   @IsString()
-  public oldPassword: string;
-
-  @IsNotEmpty()
-  @IsString()
-  public newPassword: string;
-
-  @IsNotEmpty()
-  @IsString()
-  public currentUserId: string;
+  public userId: string;
 }

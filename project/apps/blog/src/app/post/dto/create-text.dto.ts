@@ -1,22 +1,8 @@
-import {IsArray, IsNotEmpty, IsOptional, IsString} from 'class-validator';
+import {IsNotEmpty, IsString} from 'class-validator';
+import {PostTextDto} from '@project/shared/dto';
 
-export class CreateTextDto {
+export class CreateTextDto extends PostTextDto{
   @IsString()
   @IsNotEmpty()
-  public title: string;
-
-  @IsString()
-  @IsNotEmpty()
-  public anons: string;
-
-  @IsString()
-  @IsNotEmpty()
-  public text: string;
-
-  @IsArray()
-  @IsOptional()
-  public tags: string[];
-
-  @IsString()
   public userId: string;
 }

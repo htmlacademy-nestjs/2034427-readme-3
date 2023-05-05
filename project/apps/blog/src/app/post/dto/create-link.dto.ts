@@ -1,16 +1,7 @@
-import {IsArray, IsOptional, IsString, IsUrl} from 'class-validator';
+import { IsString} from 'class-validator';
+import {PostLinkDto} from '@project/shared/dto';
 
-export class CreateLinkDto {
-  @IsUrl()
-  public linkUrl: string;
-
-  @IsString()
-  public descriptionLink: string;
-
-  @IsArray()
-  @IsOptional()
-  public tags: string[];
-
+export class CreateLinkDto extends PostLinkDto{
   @IsString()
   public userId: string;
 }

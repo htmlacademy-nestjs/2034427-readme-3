@@ -2,7 +2,7 @@ import {Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post}
 import {ApiTags} from '@nestjs/swagger';
 import {TagService} from './tag.service';
 import {CreateTagDto} from "@project/shared/dto";
-import {ITag} from "@project/shared/app-types";
+import {ITag} from '@project/shared/app-types';
 
 @ApiTags('tags')
 @Controller('tags')

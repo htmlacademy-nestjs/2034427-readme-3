@@ -1,14 +1,7 @@
-import {IsNotEmpty, IsNumber, IsString} from 'class-validator';
+import {IsNotEmpty, IsString} from 'class-validator';
+import {CommentCreateDto} from '@project/shared/dto';
 
-export class CreateCommentDto {
-  @IsNotEmpty()
-  @IsString()
-  public message: string;
-
-  @IsNotEmpty()
-  @IsNumber()
-  public postId: number;
-
+export class CreateCommentDto extends CommentCreateDto{
   @IsNotEmpty()
   @IsString()
   public userId: string;

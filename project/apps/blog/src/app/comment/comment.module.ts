@@ -6,9 +6,13 @@ import {PostService} from '../post/post.service';
 import {PostRepository} from '../post/post.repository';
 import {TagRepository} from '../tag/tag.repository';
 import {TagService} from '../tag/tag.service';
-import {FavoriteRepository} from "../favorite/favorite.repository";
+import {FavoriteRepository} from '../favorite/favorite.repository';
+import {NotifyModule} from '../notify/notify.module';
 
 @Module({
+  imports: [
+    NotifyModule,
+  ],
   providers: [
     CommentService,
     CommentRepository,
@@ -16,7 +20,7 @@ import {FavoriteRepository} from "../favorite/favorite.repository";
     PostRepository,
     TagRepository,
     TagService,
-    FavoriteRepository
+    FavoriteRepository,
   ],
   controllers: [CommentController],
 })

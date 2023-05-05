@@ -1,9 +1,16 @@
-import {BadRequestException, Injectable} from '@nestjs/common';
+import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
 import {ITag} from '@project/shared/app-types';
 import {CreateTagDto} from '@project/shared/dto';
 import {TagRepository} from './tag.repository';
 import {TagEntity} from './tag.entity';
-import {MAX_COUNT_TAGS, MAX_COUNT_TAGS_ERROR} from "./tag.constant";
+import {
+  INCORRECT_TAG,
+  MAX_COUNT_TAGS,
+  MAX_COUNT_TAGS_ERROR,
+  TAG_NOT_EMPTY,
+  TAG_NOT_FOUND,
+  TAG_REGEXP
+} from "./tag.constant";
 
 @Injectable()
 export class TagService {
@@ -12,11 +19,15 @@ export class TagService {
   ) {}
 
   public async createTag(dto: CreateTagDto): Promise<ITag> {
-    const tagEntity = new TagEntity(dto);
-    return this.tagRepository.create(tagEntity);
+    const tag = await this.findOrCreateTags([dto.title]);
+    return tag[0];
   }
 
   public async deleteTag(id: number): Promise<void> {
+    const tag = await this.tagRepository.findById(id);
+    if (tag['posts'].length > 0) {
+      throw new BadRequestException(TAG_NOT_EMPTY);
+    }
     await this.tagRepository.destroy(id);
   }
 
@@ -28,15 +39,22 @@ export class TagService {
     if (tagTitles?.length > MAX_COUNT_TAGS) {
       throw new BadRequestException(MAX_COUNT_TAGS_ERROR);
     }
+
     const tags = new Set(tagTitles);
     const tagsList = [];
+
     for (const title of tags) {
-      let tag = await this.tagRepository.findByTitle(title);
+      if (!TAG_REGEXP.test(title)) {
+        throw new BadRequestException(INCORRECT_TAG);
+      }
+      const lowerCaseTitle = title.toLowerCase();
+      let tag = await this.tagRepository.findByTitle(lowerCaseTitle);
       if (!tag) {
-        tag = await this.tagRepository.create(new TagEntity({title}));
+        tag = await this.tagRepository.create(new TagEntity({title: lowerCaseTitle}));
       }
       tagsList.push(tag);
     }
+
     return tagsList;
   }
 
@@ -45,6 +63,12 @@ export class TagService {
   }
 
   public async updateTag(id: number, dto: CreateTagDto): Promise<ITag> {
+    const existTag = await this.tagRepository.findById(id);
+
+    if (!existTag) {
+      throw new NotFoundException(TAG_NOT_FOUND)
+    }
+
     const tagEntity = new TagEntity(dto);
     return this.tagRepository.update(id, tagEntity);
   }

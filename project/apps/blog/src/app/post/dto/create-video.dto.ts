@@ -1,18 +1,8 @@
-import {IsArray, IsNotEmpty, IsOptional, IsString, IsUrl} from 'class-validator';
+import {IsNotEmpty, IsString} from 'class-validator';
+import {PostVideoDto} from '@project/shared/dto';
 
-export class CreateVideoDto {
+export class CreateVideoDto extends PostVideoDto{
   @IsString()
   @IsNotEmpty()
-  public title: string;
-
-  @IsUrl()
-  @IsNotEmpty()
-  public video: string;
-
-  @IsArray()
-  @IsOptional()
-  public tags: string[];
-
-  @IsString()
   public userId: string;
 }
