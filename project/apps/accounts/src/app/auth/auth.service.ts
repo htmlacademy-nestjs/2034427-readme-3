@@ -28,8 +28,7 @@ export class AuthService {
 
   public async register({email, firstname, lastname, password, avatar}: CreateUserDto): Promise<IUser> {
     const user = {
-      email, firstname, lastname, avatar, passwordHash: '',
-      postCount: 0, subscribersCount: 0, createdAt: new Date().toISOString(),
+      email, firstname, lastname, avatar, passwordHash: '', createdAt: new Date().toISOString(),
     };
 
     const existUser = await this.userRepository.findByEmail(email);
