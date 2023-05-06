@@ -1,43 +1,8 @@
-import {ApiProperty} from "@nestjs/swagger";
-import {Expose, Transform} from "class-transformer";
+import {ApiProperty} from '@nestjs/swagger';
+import {Expose} from 'class-transformer';
+import {UserRdo} from './user.rdo';
 
-export class UserProfileRdo {
-  @ApiProperty({
-    description: 'Unique user ID',
-    example: '23'
-  })
-  @Expose({ name: '_id'})
-  @Transform(({obj}) => obj._id.toString())
-  public id: string;
-
-  @ApiProperty({
-    description: 'User Email address',
-    example: 'user@app.ru'
-  })
-  @Expose()
-  public email: string;
-
-  @ApiProperty({
-    description: 'User first name',
-    example: 'Ivanov'
-  })
-  @Expose()
-  public firstname: string;
-
-  @ApiProperty({
-    description: 'User last name',
-    example: 'Ivan'
-  })
-  @Expose()
-  public lastname: string;
-
-  @ApiProperty({
-    description: 'User avatar path',
-    example: '/static/user.png'
-  })
-  @Expose()
-  public avatar: string;
-
+export class UserProfileRdo extends UserRdo{
   @ApiProperty({
     description: 'Count created posts',
     example: 5
@@ -58,11 +23,4 @@ export class UserProfileRdo {
   })
   @Expose()
   public followingCount: number;
-
-  @ApiProperty({
-    description: 'Registration date',
-    example: '2023-03-23T16:47:37.269Z'
-  })
-  @Expose()
-  public createdAt: string;
 }

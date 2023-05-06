@@ -5,6 +5,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { TagModule } from './tag/tag.module';
 import { CommentModule } from './comment/comment.module';
 import { NotifyModule } from './notify/notify.module';
+import { FavoriteModule } from './favorite/favorite.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { NotifyModule } from './notify/notify.module';
     TagModule,
     CommentModule,
     NotifyModule,
+    FavoriteModule,
   ],
 })
 export class AppModule {}

@@ -1,6 +1,6 @@
-import {PaginationQuery} from "./pagination.query";
-import {IsEnum, IsIn, IsOptional} from "class-validator";
-import {PostStatus, PostType} from "@prisma/client";
+import {PaginationQuery} from './pagination.query';
+import {IsEnum, IsIn, IsOptional} from 'class-validator';
+import {PostStatus, PostType} from '@prisma/client';
 
 export enum SortingType {
   PublishAt = 'publishedAt',

@@ -5,10 +5,12 @@ import { AppModule } from './app/app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const config = app.get(ConfigService);
+
+  const configService = app.get(ConfigService);
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
-  const port = config.get('application.port');
+
+  const port = configService.get('application.port');
   await app.listen(port);
 
   Logger.log(
@@ -16,7 +18,7 @@ async function bootstrap() {
   );
 
   Logger.log(
-    `🎯 Current mode: ${config.get('application.environment')}`
+    `🎯 Current mode: ${configService.get('application.environment')}`
   )
 }
 

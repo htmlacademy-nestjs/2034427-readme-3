@@ -1,17 +1,15 @@
 import {ApiProperty} from '@nestjs/swagger';
 import {Expose} from 'class-transformer';
+import {IComment} from '@project/shared/app-types';
 import {PostRdo} from './post.rdo';
+import {CommentRdo} from './comment.rdo';
 
 export class PostDetailsRdo extends PostRdo{
   @ApiProperty({description: 'Is repost', example: false})
   @Expose()
   public isRepost: boolean;
 
-  @ApiProperty({description: 'ID original post', example: '2'})
+  @ApiProperty({type: [CommentRdo]})
   @Expose()
-  public originalId: string;
-
-  @ApiProperty({description: 'Author ID original post', example: '3'})
-  @Expose()
-  public originalAuthor: string;
+  public comments: IComment[]
 }

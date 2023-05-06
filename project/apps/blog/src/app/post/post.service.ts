@@ -1,30 +1,41 @@
 import {BadRequestException, Injectable, NotFoundException,} from '@nestjs/common';
-import {IPost} from '@project/shared/app-types';
+import {CreatePostType, IPost} from '@project/shared/app-types';
 import {PostType} from '@prisma/client';
 import {PostRepository} from './post.repository';
 import {PostEntity} from './post.entity';
-import {EXIST_REPOST, IS_AUTHOR, IS_REPOST, NO_AUTHOR, POST_NOT_FOUND} from './post.constant';
 import {TagService} from '../tag/tag.service';
-import {CreatePostType} from './types/create-post.type';
-import {PaginationQuery, PostQuery} from '@project/shared/dto';
+import {PaginationQuery, PostQuery, SearchQuery} from '@project/shared/dto';
+import {FavoriteRepository} from '../favorite/favorite.repository';
+import {NotifyService} from '../notify/notify.service';
+import {EXIST_REPOST, INVALID_POST_TYPE, IS_AUTHOR, IS_REPOST, NO_AUTHOR, POST_NOT_FOUND} from './post.constant';
 
 @Injectable()
 export class PostService {
   constructor(
     private readonly postRepository: PostRepository,
     private readonly tagService: TagService,
+    private readonly favoriteRepository: FavoriteRepository,
+    private readonly notifyService: NotifyService
   ) {}
 
   public async createPost(dto: CreatePostType, postType: PostType): Promise<IPost> {
     const tags = await this.tagService.findOrCreateTags(dto.tags);
     const postEntity = new PostEntity({...dto, tags, postType});
-    return this.postRepository.create(postEntity);
+    const newPost = await this.postRepository.create(postEntity);
+    await this.notifyService.register(newPost);
+    return newPost;
   }
 
-  public async updatePost(postId: number, dto: CreatePostType, postType: PostType): Promise<IPost> {
+  public async updatePost(postId: number, dto: CreatePostType, postType: PostType) {
     const existPost = await this.getPost(postId);
+    if (existPost.userId !== dto.userId) {
+      throw new BadRequestException(NO_AUTHOR)
+    }
     if (existPost.postType !== postType) {
-      throw new BadRequestException(`This post is not a type ${postType}`);
+      throw new BadRequestException(INVALID_POST_TYPE);
+    }
+    if (dto.photo) {
+      await this.notifyService.deletePhoto(existPost.photo);
     }
     const tags = await this.tagService.findOrCreateTags(dto.tags);
     const postEntity = new PostEntity({...dto, tags, postType});
@@ -36,6 +47,7 @@ export class PostService {
     if (deletedPost.userId !== userId) {
       throw new BadRequestException(NO_AUTHOR);
     }
+    await this.notifyService.deletePhoto(deletedPost.photo);
     await this.postRepository.destroy(deletedPost.postId);
   }
 
@@ -44,15 +56,23 @@ export class PostService {
   }
 
   public async getByAuthor(userId: string, query: PaginationQuery): Promise<IPost[]> {
-    return this.postRepository.getByUserId(userId, query);
+    return this.postRepository.findByUserId(userId, query);
   }
 
   public async getByTagId(tagId: number, query: PaginationQuery) {
-    return this.postRepository.getByTagId(tagId, query);
+    return this.postRepository.findByTagId(tagId, query);
+  }
+
+  public async getByUserIds(userIds: string[]): Promise<IPost[]> {
+    return this.postRepository.findByUserIds(userIds);
+  }
+
+  public async search({query}: SearchQuery) {
+    return this.postRepository.search(query);
   }
 
   public async getDraft(userId: string): Promise<IPost[]> {
-    return await this.postRepository.getDraftByUserId(userId);
+    return await this.postRepository.findDraftByUserId(userId);
   }
 
   public async getPost(id: number): Promise<PostEntity> {
@@ -61,6 +81,15 @@ export class PostService {
       throw new NotFoundException(POST_NOT_FOUND);
     }
     return new PostEntity(post);
+  }
+
+  public async changeStatus(postId: number, userId: string): Promise<IPost> {
+    const existPost = await this.getPost(postId);
+    if (existPost.userId !== userId) {
+      throw new BadRequestException(NO_AUTHOR);
+    }
+    existPost.toggleStatus();
+    return this.postRepository.update(postId, existPost);
   }
 
   public async rePost(postId: number, userId: string) {
@@ -73,7 +102,6 @@ export class PostService {
     if (existRepost) {
       throw new BadRequestException(EXIST_REPOST);
     }
-
     if (originalPost.isRepost) {
       throw new BadRequestException(IS_REPOST);
     }
@@ -82,6 +110,19 @@ export class PostService {
     postEntity.createRepost(userId);
 
     return this.postRepository.create(postEntity);
+  }
+
+  public async favorite(postId: number, userId: string): Promise<IPost> {
+    const post = await this.getPost(postId);
+    const favorite = await this.favoriteRepository.findFavorite(userId, postId);
+    if (favorite) {
+      await this.favoriteRepository.destroy(favorite.favoriteId);
+      post.decrementLikeCount();
+    } else {
+      await this.favoriteRepository.create(userId, postId);
+      post.incrementLikeCount();
+    }
+    return this.postRepository.update(postId, post);
   }
 
   public async incrementCommentCount(postId: number): Promise<void> {

@@ -39,7 +39,7 @@ export class PostEntity implements IEntity<PostEntity>, IPost {
   public fillEntity(entity: Partial<IPost>): void {
     Object.assign(this, entity)
     this.isRepost = false;
-    this.status = PostStatus.publish;
+    this.status = entity.status ?? PostStatus.publish;
   }
 
   public incrementCommentCount() {
@@ -50,11 +50,26 @@ export class PostEntity implements IEntity<PostEntity>, IPost {
     this.commentCount --;
   }
 
+  public incrementLikeCount() {
+    this.likeCount ++;
+  }
+
+  public decrementLikeCount() {
+    this.likeCount --;
+  }
+
+  public toggleStatus() {
+    this.status = (this.status === PostStatus.publish)
+      ? PostStatus.draft :
+      PostStatus.publish;
+  }
+
   public createRepost(userId) {
     this.originalId = this.postId;
     this.originalAuthor = this.userId;
     this.userId = userId;
     this.isRepost = true;
+    this.publishedAt = new Date();
     delete this.postId;
   }
 }

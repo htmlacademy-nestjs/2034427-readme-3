@@ -1,15 +1,14 @@
-import {Transform} from "class-transformer";
-import {IsNumber, IsOptional} from "class-validator";
-
-const DEFAULT_POST_COUNT_LIMIT = 25;
+import {Transform} from 'class-transformer';
+import {IsNumber, IsOptional} from 'class-validator';
 
 export class PaginationQuery {
-  @Transform(({ value } ) => +value || DEFAULT_POST_COUNT_LIMIT)
+  @Transform(({ value } ) => +value)
   @IsNumber()
   @IsOptional()
-  public limit: number = DEFAULT_POST_COUNT_LIMIT;
+  public limit: number;
 
   @Transform(({ value }) => +value)
+  @IsNumber()
   @IsOptional()
   public page: number;
 }

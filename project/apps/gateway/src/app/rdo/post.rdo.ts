@@ -3,6 +3,7 @@ import {Expose} from 'class-transformer';
 import {PostType} from '@prisma/client';
 import {ITag} from '@project/shared/app-types';
 import {UserRdo} from './user.rdo';
+import {TagRdo} from './tag.rdo';
 
 export class PostRdo {
   @ApiProperty({description: 'Unique post ID', example: '23'})
@@ -53,7 +54,7 @@ export class PostRdo {
   @Expose()
   public commentCount: number;
 
-  @ApiProperty({type: String, isArray: true, description: 'Tag list', example: [{id: 1, title: 'foo'}]})
+  @ApiProperty({type: [TagRdo], isArray: true, description: 'Tag list', example: [{id: 1, title: 'foo'}]})
   @Expose()
   public tags: ITag[];
 

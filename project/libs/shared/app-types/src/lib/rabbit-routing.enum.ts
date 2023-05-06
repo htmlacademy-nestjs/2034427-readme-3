@@ -1,4 +1,5 @@
 export enum RabbitRouting {
   AddSubscriber = 'notify.addSubscriber',
-  AddNotify = 'notify.addNotify'
+  AddNotify = 'notify.addNotify',
+  DeletePhoto = 'uploader.deletePhoto',
 }

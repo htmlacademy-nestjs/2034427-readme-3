@@ -2,13 +2,12 @@ import {Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query,
 import {ApiBearerAuth, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {ApiImplicitQuery} from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator';
 import {HttpService} from '@nestjs/axios';
-import {CommentQuery} from '../query/comments.query';
+import {CommentCreateDto, PaginationQuery} from '@project/shared/dto';
+import {fillObject} from '@project/util/util-core';
 import {ApplicationServiceURL} from '../app.config';
 import {UserId} from '../decorators/user-id.decorator';
-import {CreateCommentDto} from '../dto/create-comment.dto';
 import {JwtAuthGuard} from '../guards/jwt-auth.guard';
-import {fillObject} from "@project/util/util-core";
-import {CommentRdo} from "../rdo/comment.rdo";
+import {CommentRdo} from '../rdo/comment.rdo';
 
 @ApiTags('Comments')
 @Controller('comments')
@@ -25,7 +24,7 @@ export class CommentsController {
   @ApiImplicitQuery({name: 'limit', required: false, type: Number})
   @ApiImplicitQuery({name: 'page', required: false, type: Number})
   @Get('post/:id')
-  public async getByPost(@Param('id') postId: number, @Query() query: CommentQuery) {
+  public async getByPost(@Param('id') postId: number, @Query() query: PaginationQuery) {
     const {data} = await this.httpService.axiosRef.get(`${ApplicationServiceURL.Comments}/post/${postId}`, {
       params: query,
     });
@@ -40,7 +39,7 @@ export class CommentsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Post()
-  public async create(@Body() dto: CreateCommentDto, @UserId() userId: string) {
+  public async create(@Body() dto: CommentCreateDto, @UserId() userId: string) {
     const {data} = await this.httpService.axiosRef.post(`${ApplicationServiceURL.Comments}`, {...dto, userId});
     return fillObject(CommentRdo, data);
   }
