@@ -5,12 +5,12 @@ import {TagRepository} from './tag.repository';
 import {TagEntity} from './tag.entity';
 import {
   INCORRECT_TAG,
-  MAX_COUNT_TAGS,
   MAX_COUNT_TAGS_ERROR,
   TAG_NOT_EMPTY,
   TAG_NOT_FOUND,
-  TAG_REGEXP
-} from "./tag.constant";
+  TAG_REGEXP,
+  TagConstant
+} from "@project/shared/validation";
 
 @Injectable()
 export class TagService {
@@ -36,7 +36,7 @@ export class TagService {
   }
 
   public async findOrCreateTags(tagTitles: string[]): Promise<ITag[]> {
-    if (tagTitles?.length > MAX_COUNT_TAGS) {
+    if (tagTitles?.length > TagConstant.MaxCount) {
       throw new BadRequestException(MAX_COUNT_TAGS_ERROR);
     }
 

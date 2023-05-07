@@ -3,11 +3,9 @@ import {ArrayNotEmpty, IsArray, IsOptional, IsString, IsUrl, Length, MaxLength} 
 import {
   INVALID_DESC_MAX_LENGTH,
   INVALID_TAG_LENGTH,
-  INVALID_URL,
-  LINK_DESC_MAX_LENGTH,
-  TAG_MAX_LENGTH,
-  TAG_MIN_LENGTH
+  INVALID_URL
 } from "@project/shared/validation";
+import {PostConstant, TagConstant} from "@project/shared/validation";
 
 export class PostLinkDto {
   @ApiProperty({
@@ -24,7 +22,7 @@ export class PostLinkDto {
     required: true
   })
   @IsString()
-  @MaxLength(LINK_DESC_MAX_LENGTH, {message: INVALID_DESC_MAX_LENGTH})
+  @MaxLength(PostConstant.LinkDescMaxLength, {message: INVALID_DESC_MAX_LENGTH})
   @IsOptional()
   public descriptionLink: string;
 
@@ -36,7 +34,7 @@ export class PostLinkDto {
   @IsArray()
   @ArrayNotEmpty()
   @IsString({ each: true })
-  @Length(TAG_MIN_LENGTH, TAG_MAX_LENGTH, {message: INVALID_TAG_LENGTH, each: true})
+  @Length(TagConstant.MinLength, TagConstant.MaxLength, {message: INVALID_TAG_LENGTH, each: true})
   @IsOptional()
   public tags: string[];
 }

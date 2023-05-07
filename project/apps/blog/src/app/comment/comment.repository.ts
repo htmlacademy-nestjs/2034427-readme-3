@@ -4,7 +4,7 @@ import {ICRUDRepository} from '@project/util/util-types';
 import {PaginationQuery} from '@project/shared/dto';
 import {PrismaService} from '../prisma/prisma.service';
 import {CommentEntity} from './comment.entity';
-import {DEFAULT_COMMENT_COUNT_LIMIT} from './comment.constant';
+import {CommentConstant} from "@project/shared/validation";
 
 @Injectable()
 export class CommentRepository implements ICRUDRepository<CommentEntity, number, IComment>{
@@ -34,7 +34,7 @@ export class CommentRepository implements ICRUDRepository<CommentEntity, number,
   }
 
   public async find(query: PaginationQuery, postId: number = null): Promise<IComment[]> {
-    const {limit = DEFAULT_COMMENT_COUNT_LIMIT, page} = query;
+    const {limit = CommentConstant.DefaultCount, page} = query;
     return this.prisma.comment.findMany({
       where: {
         post: {

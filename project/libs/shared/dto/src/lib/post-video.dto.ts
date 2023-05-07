@@ -3,9 +3,10 @@ import {ArrayNotEmpty, IsArray, IsNotEmpty, IsOptional, IsString, Length, Matche
 import {
   INVALID_TAG_LENGTH,
   INVALID_TITLE_LENGTH,
-  INVALID_YOUTUBE_URL, TAG_MAX_LENGTH, TAG_MIN_LENGTH, TITLE_MAX_LENGTH,
-  TITLE_MIN_LENGTH, YOUTUBE_LINK_REGEX
+  INVALID_YOUTUBE_URL,
+  YOUTUBE_LINK_REGEX
 } from "@project/shared/validation";
+import {PostConstant, TagConstant} from "@project/shared/validation";
 
 export class PostVideoDto {
   @ApiProperty({
@@ -14,7 +15,7 @@ export class PostVideoDto {
     required: true
   })
   @IsString()
-  @Length(TITLE_MIN_LENGTH, TITLE_MAX_LENGTH, {message: INVALID_TITLE_LENGTH})
+  @Length(PostConstant.TitleMinLength, PostConstant.TitleMaxLength, {message: INVALID_TITLE_LENGTH})
   @IsNotEmpty()
   public title: string;
 
@@ -35,7 +36,7 @@ export class PostVideoDto {
   @IsArray()
   @ArrayNotEmpty()
   @IsString({ each: true })
-  @Length(TAG_MIN_LENGTH, TAG_MAX_LENGTH, {message: INVALID_TAG_LENGTH, each: true})
+  @Length(TagConstant.MinLength, TagConstant.MaxLength, {message: INVALID_TAG_LENGTH, each: true})
   @IsOptional()
   public tags: string[];
 }

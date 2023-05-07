@@ -1,6 +1,7 @@
 import {IUser} from '@project/shared/app-types';
 import {compare, genSalt, hash} from 'bcrypt';
-import {SALT_ROUNDS} from './user.constant';
+
+const SALT_ROUNDS = 10;
 
 export class UserEntity implements IUser {
   public _id: string;
