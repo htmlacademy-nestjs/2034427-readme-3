@@ -1,9 +1,0 @@
-export const DEFAULT_POST_COUNT = 25;
-export const DEFAULT_SEARCH_COUNT = 20;
-export const DEFAULT_COMMENTS_COUNT = 5;
-export const POST_NOT_FOUND = 'Post not found';
-export const NO_AUTHOR = 'You not is this post author';
-export const IS_AUTHOR = 'You author of this post';
-export const IS_REPOST = 'This is repost';
-export const EXIST_REPOST = 'Repost already created';
-export const INVALID_POST_TYPE = 'Invalid post type';

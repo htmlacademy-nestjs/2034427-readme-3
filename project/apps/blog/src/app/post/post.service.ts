@@ -7,7 +7,14 @@ import {TagService} from '../tag/tag.service';
 import {PaginationQuery, PostQuery, SearchQuery} from '@project/shared/dto';
 import {FavoriteRepository} from '../favorite/favorite.repository';
 import {NotifyService} from '../notify/notify.service';
-import {EXIST_REPOST, INVALID_POST_TYPE, IS_AUTHOR, IS_REPOST, NO_AUTHOR, POST_NOT_FOUND} from './post.constant';
+import {
+  EXIST_REPOST,
+  INVALID_POST_TYPE,
+  IS_POST_AUTHOR,
+  IS_POST_REPOST,
+  NO_POST_AUTHOR,
+  POST_NOT_FOUND
+} from "@project/shared/validation";
 
 @Injectable()
 export class PostService {
@@ -29,7 +36,7 @@ export class PostService {
   public async updatePost(postId: number, dto: CreatePostType, postType: PostType) {
     const existPost = await this.getPost(postId);
     if (existPost.userId !== dto.userId) {
-      throw new BadRequestException(NO_AUTHOR)
+      throw new BadRequestException(NO_POST_AUTHOR)
     }
     if (existPost.postType !== postType) {
       throw new BadRequestException(INVALID_POST_TYPE);
@@ -45,7 +52,7 @@ export class PostService {
   public async deletePost(id: number, userId: string): Promise<void> {
     const deletedPost = await this.getPost(id);
     if (deletedPost.userId !== userId) {
-      throw new BadRequestException(NO_AUTHOR);
+      throw new BadRequestException(NO_POST_AUTHOR);
     }
     await this.notifyService.deletePhoto(deletedPost.photo);
     await this.postRepository.destroy(deletedPost.postId);
@@ -86,7 +93,7 @@ export class PostService {
   public async changeStatus(postId: number, userId: string): Promise<IPost> {
     const existPost = await this.getPost(postId);
     if (existPost.userId !== userId) {
-      throw new BadRequestException(NO_AUTHOR);
+      throw new BadRequestException(NO_POST_AUTHOR);
     }
     existPost.toggleStatus();
     return this.postRepository.update(postId, existPost);
@@ -95,7 +102,7 @@ export class PostService {
   public async rePost(postId: number, userId: string) {
     const originalPost = await this.getPost(postId);
     if (originalPost.userId === userId) {
-      throw new BadRequestException(IS_AUTHOR)
+      throw new BadRequestException(IS_POST_AUTHOR)
     }
 
     const existRepost = await this.postRepository.findRepost(postId, userId);
@@ -103,7 +110,7 @@ export class PostService {
       throw new BadRequestException(EXIST_REPOST);
     }
     if (originalPost.isRepost) {
-      throw new BadRequestException(IS_REPOST);
+      throw new BadRequestException(IS_POST_REPOST);
     }
 
     const postEntity = new PostEntity(originalPost);

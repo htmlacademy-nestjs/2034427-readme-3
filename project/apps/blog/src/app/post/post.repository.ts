@@ -5,7 +5,7 @@ import {PostStatus} from '@prisma/client';
 import {PaginationQuery, PostQuery, SortingType} from '@project/shared/dto'
 import {PostEntity} from './post.entity';
 import {PrismaService} from '../prisma/prisma.service';
-import {DEFAULT_COMMENTS_COUNT, DEFAULT_POST_COUNT, DEFAULT_SEARCH_COUNT} from './post.constant';
+import {PostConstant} from "@project/shared/validation";
 
 @Injectable()
 export class PostRepository implements ICRUDRepository<PostEntity, number, IPost>{
@@ -29,7 +29,7 @@ export class PostRepository implements ICRUDRepository<PostEntity, number, IPost
   }
 
   public async find(query: PostQuery): Promise<IPost[]> {
-    const {postType, limit = DEFAULT_POST_COUNT, page, sort, direction, status} = query;
+    const {postType, limit = PostConstant.DefaultCount, page, sort, direction, status} = query;
     return this.prisma.post.findMany({
       where: {
         AND: [
@@ -53,14 +53,14 @@ export class PostRepository implements ICRUDRepository<PostEntity, number, IPost
         tags: true,
         comments: {
           orderBy: {createdAt: 'desc'},
-          take: DEFAULT_COMMENTS_COUNT,
+          take: PostConstant.DefaultCommentCount,
         },
       }
     });
   }
 
   public async findByUserId(userId: string, query: PaginationQuery): Promise<IPost[]> {
-    const {limit = DEFAULT_POST_COUNT, page} = query;
+    const {limit = PostConstant.DefaultCount, page} = query;
     return this.prisma.post.findMany({
       where: {
         AND: [
@@ -87,7 +87,7 @@ export class PostRepository implements ICRUDRepository<PostEntity, number, IPost
   }
 
   public async findByTagId(tagId: number, query: PaginationQuery): Promise<IPost[]> {
-    const {limit = DEFAULT_POST_COUNT, page} = query;
+    const {limit = PostConstant.DefaultCount, page} = query;
     return this.prisma.post.findMany({
       where: {
         AND: [
@@ -138,7 +138,7 @@ export class PostRepository implements ICRUDRepository<PostEntity, number, IPost
         ]
       },
       include: {tags: true, comments: true},
-      take: DEFAULT_SEARCH_COUNT,
+      take: PostConstant.DefaultSearchCount,
     })
   }
 

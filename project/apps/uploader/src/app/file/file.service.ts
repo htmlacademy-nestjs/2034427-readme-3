@@ -33,9 +33,7 @@ export class FileService {
   }
 
   public async delete(path: string) {
-    const pathParts = path.split('/');
-    pathParts.splice(1, 1);
-    const filePath = `${this.applicationConfig.uploadDirectory}${pathParts.join('/')}`;
-    await remove(filePath);
+    const pathPhoto = path.replace(this.applicationConfig.serveRoot, '');
+    await remove(`${this.applicationConfig.uploadDirectory}${pathPhoto}`);
   }
 }

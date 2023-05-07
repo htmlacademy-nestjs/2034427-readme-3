@@ -3,9 +3,9 @@ import {ArrayNotEmpty, IsArray, IsNotEmpty, IsOptional, IsString, Length} from '
 import {
   INVALID_QUOTE_AUTHOR_LENGTH,
   INVALID_QUOTE_LENGTH,
-  INVALID_TAG_LENGTH, QUOTE_AUTHOR_MAX_LENGTH, QUOTE_AUTHOR_MIN_LENGTH, QUOTE_MAX_LENGTH,
-  QUOTE_MIN_LENGTH, TAG_MAX_LENGTH, TAG_MIN_LENGTH
+  INVALID_TAG_LENGTH
 } from "@project/shared/validation";
+import {PostConstant, TagConstant} from "@project/shared/validation";
 
 export class PostQuoteDto {
   @ApiProperty({
@@ -14,7 +14,7 @@ export class PostQuoteDto {
     required: true
   })
   @IsString()
-  @Length(QUOTE_MIN_LENGTH, QUOTE_MAX_LENGTH, {message: INVALID_QUOTE_LENGTH})
+  @Length(PostConstant.QuoteMinLength, PostConstant.QuoteMaxLength, {message: INVALID_QUOTE_LENGTH})
   @IsNotEmpty()
   public text: string;
 
@@ -24,7 +24,7 @@ export class PostQuoteDto {
     required: true
   })
   @IsString()
-  @Length(QUOTE_AUTHOR_MIN_LENGTH, QUOTE_AUTHOR_MAX_LENGTH, {message: INVALID_QUOTE_AUTHOR_LENGTH})
+  @Length(PostConstant.QuoteAuthorMinLength, PostConstant.QuoteAuthorMaxLength, {message: INVALID_QUOTE_AUTHOR_LENGTH})
   @IsNotEmpty()
   public quoteAuthor: string;
 
@@ -36,7 +36,7 @@ export class PostQuoteDto {
   @IsArray()
   @ArrayNotEmpty()
   @IsString({ each: true })
-  @Length(TAG_MIN_LENGTH, TAG_MAX_LENGTH, {message: INVALID_TAG_LENGTH, each: true})
+  @Length(TagConstant.MinLength, TagConstant.MaxLength, {message: INVALID_TAG_LENGTH, each: true})
   @IsOptional()
   public tags: string[];
 }

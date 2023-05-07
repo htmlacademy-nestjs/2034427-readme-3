@@ -1,19 +1,12 @@
 import {ApiProperty} from '@nestjs/swagger';
 import {ArrayNotEmpty, IsArray, IsNotEmpty, IsOptional, IsString, Length} from 'class-validator';
 import {
-  ANONS_MAX_LENGTH,
-  ANONS_MIN_LENGTH,
   INVALID_ANONS_LENGTH,
   INVALID_TAG_LENGTH,
   INVALID_TEXT_LENGTH,
-  INVALID_TITLE_LENGTH,
-  TAG_MAX_LENGTH,
-  TAG_MIN_LENGTH,
-  TEXT_MAX_LENGTH,
-  TEXT_MIN_LENGTH,
-  TITLE_MAX_LENGTH,
-  TITLE_MIN_LENGTH
+  INVALID_TITLE_LENGTH
 } from "@project/shared/validation";
+import {PostConstant, TagConstant} from "@project/shared/validation";
 
 export class PostTextDto {
   @ApiProperty({
@@ -22,7 +15,7 @@ export class PostTextDto {
     required: true
   })
   @IsString()
-  @Length(TITLE_MIN_LENGTH, TITLE_MAX_LENGTH, {message: INVALID_TITLE_LENGTH})
+  @Length(PostConstant.TitleMinLength, PostConstant.TitleMaxLength, {message: INVALID_TITLE_LENGTH})
   @IsNotEmpty()
   public title: string;
 
@@ -32,7 +25,7 @@ export class PostTextDto {
     required: true
   })
   @IsString()
-  @Length(ANONS_MIN_LENGTH, ANONS_MAX_LENGTH, {message: INVALID_ANONS_LENGTH})
+  @Length(PostConstant.AnonsMinLength, PostConstant.AnonsMaxLength, {message: INVALID_ANONS_LENGTH})
   @IsNotEmpty()
   public anons: string;
 
@@ -42,7 +35,7 @@ export class PostTextDto {
     required: true
   })
   @IsString()
-  @Length(TEXT_MIN_LENGTH, TEXT_MAX_LENGTH, {message: INVALID_TEXT_LENGTH})
+  @Length(PostConstant.TextMinLength, PostConstant.TextMaxLength, {message: INVALID_TEXT_LENGTH})
   @IsNotEmpty()
   public text: string;
 
@@ -54,7 +47,7 @@ export class PostTextDto {
   @IsArray()
   @ArrayNotEmpty()
   @IsString({ each: true })
-  @Length(TAG_MIN_LENGTH, TAG_MAX_LENGTH, {message: INVALID_TAG_LENGTH, each: true})
+  @Length(TagConstant.MinLength, TagConstant.MaxLength, {message: INVALID_TAG_LENGTH, each: true})
   @IsOptional()
   public tags: string[];
 }

@@ -1,17 +1,12 @@
 import {ApiProperty} from '@nestjs/swagger';
 import {IsEmail, IsNotEmpty, IsOptional, IsString, Length} from 'class-validator';
 import {
-  FIRSTNAME_MAX_LENGTH,
-  FIRSTNAME_MIN_LENGTH,
   INVALID_EMAIL,
   INVALID_FIRSTNAME_LENGTH,
   INVALID_LASTNAME_LENGTH,
-  INVALID_PASSWORD_LENGTH,
-  LASTNAME_MAX_LENGTH,
-  LASTNAME_MIN_LENGTH,
-  PASSWORD_MAX_LENGTH,
-  PASSWORD_MIN_LENGTH
+  INVALID_PASSWORD_LENGTH
 } from "@project/shared/validation";
+import {AuthConstant} from "@project/shared/validation";
 
 export class CreateUserDto {
   @ApiProperty({
@@ -27,7 +22,7 @@ export class CreateUserDto {
     example: 'Firstname'
   })
   @IsString()
-  @Length(FIRSTNAME_MIN_LENGTH, FIRSTNAME_MAX_LENGTH, {message: INVALID_FIRSTNAME_LENGTH})
+  @Length(AuthConstant.FirstNameMinLength, AuthConstant.FirstNameMaxLength, {message: INVALID_FIRSTNAME_LENGTH})
   @IsNotEmpty()
   public firstname: string;
 
@@ -36,7 +31,7 @@ export class CreateUserDto {
     example: 'Lastname'
   })
   @IsString()
-  @Length(LASTNAME_MIN_LENGTH, LASTNAME_MAX_LENGTH, {message: INVALID_LASTNAME_LENGTH})
+  @Length(AuthConstant.LastNameMinLength, AuthConstant.LastNameMaxLength, {message: INVALID_LASTNAME_LENGTH})
   @IsNotEmpty()
   public lastname: string;
 
@@ -45,7 +40,7 @@ export class CreateUserDto {
     example: 'password'
   })
   @IsString()
-  @Length(PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH, {message: INVALID_PASSWORD_LENGTH})
+  @Length(AuthConstant.PasswordMinLength, AuthConstant.PasswordMaxLength, {message: INVALID_PASSWORD_LENGTH})
   @IsNotEmpty()
   public password: string;
 

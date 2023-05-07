@@ -1,9 +1,9 @@
 import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
 import {IUser} from '@project/shared/app-types';
 import {UserRepository} from './user.repository';
-import {CAN_BE_EQUAL, INVALID_OLD_PASSWORD, USER_NOT_FOUND} from './user.constant';
 import {UserEntity} from './user.entity';
 import {ChangePasswordDto} from './dto/change-password.dto';
+import {CAN_BE_EQUAL, INVALID_OLD_PASSWORD, USER_NOT_FOUND} from "@project/shared/validation";
 
 @Injectable()
 export class UserService {

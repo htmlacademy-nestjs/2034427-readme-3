@@ -5,7 +5,7 @@ import {CommentRepository} from './comment.repository';
 import {PostService} from '../post/post.service';
 import {CommentEntity} from './comment.entity';
 import {CreateCommentDto} from './dto/create-comment.dto';
-import {COMMENT_NOT_FOUND, NOT_AUTHOR, YOUR_POST} from './comment.constant';
+import {COMMENT_NOT_FOUND, NOT_COMMENT_AUTHOR, YOUR_POST} from "@project/shared/validation";
 
 @Injectable()
 export class CommentService {
@@ -30,7 +30,7 @@ export class CommentService {
       throw new NotFoundException(COMMENT_NOT_FOUND)
     }
     if (comment.userId !== userId) {
-      throw new BadRequestException(NOT_AUTHOR);
+      throw new BadRequestException(NOT_COMMENT_AUTHOR);
     }
     await this.postService.decrementCommentCount(comment.postId);
     await this.commentRepository.destroy(commentId);

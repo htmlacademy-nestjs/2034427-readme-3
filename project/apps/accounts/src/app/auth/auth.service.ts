@@ -13,9 +13,14 @@ import {createJWTPayload} from '@project/util/util-core';
 import * as crypto from 'node:crypto';
 import {CreateUserDto, LoginUserDto} from '@project/shared/dto';
 import {TokenService} from '../token/token.service';
-import {AUTH_USER_EXISTS, INVALID_CREDENTIALS, INVALID_REFRESH_TOKEN, TOKEN_NOT_FOUND} from './auth.constant';
 import { UserEntity } from '../user/user.entity';
 import { UserRepository } from '../user/user.repository';
+import {
+  AUTH_USER_EXISTS,
+  INVALID_CREDENTIALS,
+  INVALID_REFRESH_TOKEN,
+  TOKEN_NOT_FOUND
+} from "@project/shared/validation";
 
 @Injectable()
 export class AuthService {
